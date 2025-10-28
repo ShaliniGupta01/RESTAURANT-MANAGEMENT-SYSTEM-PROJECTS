@@ -1,0 +1,200 @@
+.checkout-shell {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 18px;
+  min-height: 100vh;
+}
+
+/* ---------------- CART ITEMS ---------------- */
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: transform 0.2s ease;
+}
+
+
+/*  Image styling */
+.cart-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f3f4f6;
+}
+
+.cart-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/*  Info section */
+.cart-info {
+  flex: 1;
+  margin-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ci-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.ci-price {
+  font-size: 14px;
+  color: #666;
+}
+
+/*  Quantity controls */
+.ci-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ci-controls button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e6eee9;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ci-controls button:hover {
+  background-color: #e7e7e7;
+}
+
+.ci-controls span {
+  min-width: 22px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ---------------- ORDER TYPE TOGGLE ---------------- */
+.order-type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 400px;
+  background: #afb0b0;
+  border-radius: 30px;
+  padding: 6px;
+  margin: 14px 0;
+  position: relative;
+}
+
+.order-type button {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  border-radius: 30px;
+  color: #333;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  z-index: 2;
+  position: relative;
+  cursor: pointer;
+}
+
+.order-type .active {
+  color: #181818;
+}
+
+.order-type::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  background: rgb(232, 231, 231);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+/* Moves highlight when switched */
+.order-type.swap::before {
+  left: calc(50% + 0px);
+}
+
+/* ---------------- BUTTON & COOKING NOTE ---------------- */
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  margin-top: -80px;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #f5f5f5;
+}
+
+.cook-summary {
+  margin-top: 18px;
+  margin-bottom: 12px;
+  border: none;
+  border-bottom: 2px dotted #94d3a2;
+  padding-bottom: 6px;
+  color: #333;
+  font-size: 14px;
+}
+
+/* ---------------- ADD COOKING INSTRUCTION ---------------- */
+.add-instruction {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  color: #999;
+  border: none;
+  border-bottom: 2px dotted #ccc;
+  padding: 6px 0;
+  margin-top: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+
+.add-instruction:hover {
+  color: #666;
+  border-bottom-color: #aaa;
+}
+
+/*  Responsive fix for small screens */
+@media (max-width: 480px) {
+  .cart-item {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cart-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .order-type {
+    width: 100%;
+  }
+}

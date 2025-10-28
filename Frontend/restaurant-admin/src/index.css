@@ -1,0 +1,14 @@
+:root {
+  --accent: #0ea37a;
+  --muted: #6b7280;
+  --card-bg: #ffffff;
+  --sidebar-bg: #f7faf9;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}

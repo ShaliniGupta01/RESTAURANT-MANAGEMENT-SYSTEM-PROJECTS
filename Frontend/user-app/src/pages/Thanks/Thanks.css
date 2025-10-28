@@ -1,0 +1,36 @@
+ .thanks-page {
+  background-color: #27ae60;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.thanks-page h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.checkmark-circle {
+  background: #f1f1f1;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+
+.redirect-text {
+  position: absolute;
+  bottom: 30px;
+  font-size: 14px;
+  color: #fff;
+  opacity: 0.9;
+} 

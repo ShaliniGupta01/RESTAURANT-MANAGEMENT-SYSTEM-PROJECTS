@@ -1,0 +1,15 @@
+.chart-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03)
+}
+
+.chart-title {
+    font-weight: 700;
+    margin-bottom: 8px
+}
+
+.chart-body {
+    min-height: 140px
+}

@@ -1,0 +1,109 @@
+.cook-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;
+  z-index: 200;
+}
+
+.cook-card {
+  background: #f9fafb;
+  width: 95%;
+  max-width: 420px;
+  border-radius: 18px;
+  padding: 20px 16px 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  margin-top: 160px;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cook-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.cook-card textarea {
+  width: 100%;
+  height: 90px;
+  border: 1px solid #e6eee9;
+  border-radius: 10px;
+  padding: 0px;
+  margin-top: 10px;
+  resize: none;
+  font-size: 16px;
+  outline: none;
+  background: #fff;
+}
+
+.cook-note {
+  font-size: 12px;
+  color: #777;
+  margin-top: 6px;
+}
+
+.cook-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  background: #f3f4f6;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 500;
+}
+
+.btn-next {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-next:hover {
+  background: #222;
+}

@@ -1,0 +1,84 @@
+.sidebar {
+  width: 90px;
+  background: #f0f5f3;
+  border-right: 1px solid #e6eee9;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 65px;
+  background-color: #fff;
+  border-radius: 50px;
+  padding: 20px 0;
+  height: 95%;
+}
+
+/* keep all icons close together */
+.nav-icons-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* circular nav icons */
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  text-decoration: none;
+  background-color: #f0f5f3;
+  color: #4b5563;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item:hover {
+  background-color: #fbfefe;
+  color: #151615;
+  transform: translateY(-2px);
+}
+
+.nav-item.active {
+  background-color: #9d9e9d;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/*  Extra bottom circle (empty) */
+.bottom-circle {
+  width: 50px;
+  height: 50px;
+  background: #f0f5f3;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-bottom: 10px;
+}
+
+@media (max-height: 700px) {
+  .nav-icons-group {
+    gap: 8px;
+  }
+  .nav-item {
+    width: 44px;
+    height: 44px;
+  }
+  .bottom-circle {
+    width: 44px;
+    height: 44px;
+  }
+}
