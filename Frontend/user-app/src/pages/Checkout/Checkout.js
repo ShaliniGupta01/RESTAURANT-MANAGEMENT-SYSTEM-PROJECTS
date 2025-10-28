@@ -180,7 +180,7 @@ export default function Checkout() {
                   it.image
                     ? it.image.startsWith("http")
                       ? it.image
-                      : `http://localhost:5000/${it.image}`
+                      : `https://restaurant-backend-1rky.onrender.com/${it.image}`
                     : "/placeholder.png"
                 }
                 alt={it.name}
