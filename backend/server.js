@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 // CORS (allow admin & user apps)
 app.use(
   cors({
-    origin: ["https://user-appsg.netlify.app/", "https://restaurant-adminsg.netlify.app/analytics"],
+    origin: ["https://restaurant-management-system-projec.vercel.app/", "https://restaurant-management-system-projec-ten.vercel.app/analytics"],
     credentials: true,
   })
 );
