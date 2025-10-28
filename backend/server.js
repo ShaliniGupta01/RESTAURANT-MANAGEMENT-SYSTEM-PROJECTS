@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 // CORS (allow admin & user apps)
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["https://user-appsg.netlify.app/", "https://restaurant-adminsg.netlify.app/analytics"],
     credentials: true,
   })
 );
