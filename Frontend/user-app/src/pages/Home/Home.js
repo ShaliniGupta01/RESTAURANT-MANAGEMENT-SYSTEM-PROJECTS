@@ -8,7 +8,7 @@ import "./Home.css";
 
 const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://restaurant-backend-1rky.onrender.com";
 
 export default function Home() {
   const navigate = useNavigate();

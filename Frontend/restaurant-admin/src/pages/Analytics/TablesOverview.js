@@ -15,7 +15,7 @@ export default function TablesOverview() {
 
   const fetchTables = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/tables");
+      const res = await axios.get("https://restaurant-backend-1rky.onrender.com/api/tables");
       let data = res.data || [];
 
       // ensure always 30 tables
