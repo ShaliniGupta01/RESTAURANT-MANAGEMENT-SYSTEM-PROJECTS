@@ -25,8 +25,8 @@ const __dirname = path.dirname(__filename);
 app.use(
   cors({
       origin: [
-      "https://restaurant-management-system-projects-admin-h4hh6lk0i.vercel.app/analytics",
-      "https://restaurant-management-syste-git-9f0d8c-shalinigupta01s-projects.vercel.app",
+      "https://restaurant-management-system-projec-ten.vercel.app/analytics",
+      "https://restaurant-management-system-projec.vercel.app/",
       "http://localhost:3000",
       "http://localhost:3001",
     ],
