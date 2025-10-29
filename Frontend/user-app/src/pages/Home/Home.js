@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
-const BASE_URL = "https://restaurant-backend-1rky.onrender.com";
+
+const BASE_URL = "http://localhost:5000";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -195,3 +196,5 @@ export default function Home() {
     </div>
   );
 }
+
+
