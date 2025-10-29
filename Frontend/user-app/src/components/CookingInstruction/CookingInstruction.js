@@ -39,3 +39,4 @@ export default function CookInstructionsModal({ visible, onClose, onSave }) {
     </div>
   );
 }
+

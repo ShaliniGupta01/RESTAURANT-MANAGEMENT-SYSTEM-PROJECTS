@@ -51,3 +51,4 @@ export default function FoodCard({ item, qty, onChangeQty }) {
     </div>
   );
 }
+

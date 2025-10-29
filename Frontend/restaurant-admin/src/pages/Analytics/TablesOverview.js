@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import ChartCard from "../../components/ChartCard";
-import axios from "axios";
+import axios from "../../api/axios";
 import "./TablesOverview.css";
 
 export default function TablesOverview() {
@@ -15,7 +15,7 @@ export default function TablesOverview() {
 
   const fetchTables = async () => {
     try {
-      const res = await axios.get("https://restaurant-backend-1rky.onrender.com/api/tables");
+      const res = await axios.get("https://restaurant-backend-1rky.onrender.com/");
       let data = res.data || [];
 
       // ensure always 30 tables

@@ -58,7 +58,7 @@ header {
   padding-top: 5px;
 }
 
-/* Main content (fit remaining space) */
+/* Main content */
 .content-area {
   flex: 1;
   background: #ffffff;
@@ -66,5 +66,4 @@ header {
   height: 100%;
   border-radius: 32px;
   overflow: auto;
-
 }

@@ -145,4 +145,3 @@ function CreateTable({ onCreate, onCancel, loading }) {
 }
 
 
-

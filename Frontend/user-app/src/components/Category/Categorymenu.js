@@ -41,3 +41,4 @@ export default function Categorymenu({ categories = [], selected, onSelect }) {
     </div>
   );
 }
+
