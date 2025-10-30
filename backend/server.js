@@ -27,8 +27,6 @@ app.use(
       origin: [
       "https://restaurant-management-system-projec-ten.vercel.app/analytics",
       "https://restaurant-management-system-projec.vercel.app/",
-      "http://localhost:3000",
-      "http://localhost:3001",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
