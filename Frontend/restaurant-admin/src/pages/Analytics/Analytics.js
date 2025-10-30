@@ -137,7 +137,7 @@ const getBlurClass = (section) => {
       <div className="analytics-grid">
         <div className={getBlurClass("orderSummary")}>
           <OrderSummary
-            served={orders?.served || orders?.done || 0}
+            served={orders?.served || 0}
             dineIn={orders?.dineIn || 0}
             takeAway={orders?.takeAway || 0}
             filter={filter}

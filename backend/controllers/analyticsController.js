@@ -3,7 +3,7 @@ import Chef from "../models/chefModel.js";
 
 export const getAnalytics = async (req, res) => {
   try {
-    // --- Basic stats ---
+    // --- Basic Stats ---
     const totalOrders = await Order.countDocuments();
     const totalChefs = await Chef.countDocuments();
 
@@ -36,24 +36,27 @@ export const getAnalytics = async (req, res) => {
       },
     ]);
 
-    // Helper: safely get count for any status key
+    // --- Helper: safely get count for any status key ---
     const getCount = (key) =>
       statusAgg.find((s) => s._id === key.toLowerCase())?.count || 0;
 
-    //  Combine both “served” and “done” as “served”
+    // --- Combine both “served” and “done” as “served” ---
     const servedCount = getCount("served") + getCount("done");
 
     // --- Construct order summary ---
     const orders = {
-      served: servedCount,
+      served: servedCount, // ✅ unified served data
       processing: getCount("processing"),
-      done: getCount("done"),
       dineIn:
-        typeAgg.find((t) => t._id === "dine in" || t._id === "dinein")?.count ||
-        0,
+        typeAgg.find(
+          (t) => t._id === "dine-in" || t._id === "dine in" || t._id === "dinein"
+        )?.count || 0,
       takeAway:
         typeAgg.find(
-          (t) => t._id === "takeaway" || t._id === "take away"
+          (t) =>
+            t._id === "takeaway" ||
+            t._id === "take away" ||
+            t._id === "take_away"
         )?.count || 0,
     };
 
