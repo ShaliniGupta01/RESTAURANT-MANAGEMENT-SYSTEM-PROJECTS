@@ -15,7 +15,7 @@ export default function Tables() {
   // === Fetch all tables ===
   const fetchTables = async () => {
     try {
-      const res = await API.get("/tables");
+      const res = await API.get("/api/tables");
       if (Array.isArray(res.data)) setTables(res.data);
       else if (res.data.tables) setTables(res.data.tables);
       else setTables(res.data || []);
@@ -29,7 +29,7 @@ export default function Tables() {
   const addTable = async (payload) => {
     try {
       setLoading(true);
-      const res = await API.post("/tables", payload);
+      const res = await API.post("/api/tables", payload);
       setTables((prev) => [...prev, res.data]);
       setShowModal(false);
     } catch (err) {
@@ -43,7 +43,7 @@ export default function Tables() {
   // === Delete a table ===
   const deleteTable = async (id) => {
     try {
-      await API.delete(`/tables/${id}`);
+      await API.delete(`/api/tables/${id}`);
       setTables((prev) => prev.filter((t) => t._id !== id));
     } catch (err) {
       console.error("Error deleting table:", err);
