@@ -12,28 +12,28 @@ import chefRoutes from "./routes/chefRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 
-// Load environment variables
-dotenv.config({ quiet: true });
+dotenv.config({quiet:true});
 
-// Initialize Express app
 const app = express();
 
-// Fix for __dirname in ES Modules
+// Fix for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+//  FIXED CORS CONFIG
 app.use(
   cors({
-      origin: [
-      "https://restaurant-management-system-projec-ten.vercel.app/analytics",
-      "https://restaurant-management-system-projec.vercel.app/",
+    origin: [
+      "https://restaurant-management-system-projec.vercel.app",
+      "https://restaurant-management-system-projec-ten.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
 
- app.options(/.*/, cors());
+//  OPTIONS route for preflight
+app.options(/.*/, cors());
 
 
 // Middleware
@@ -41,13 +41,13 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static uploads
+// Static files
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
-// Connect to MongoDB
+// Connect DB
 connectDB();
 
-// API routes
+// Routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/tables", tableRoutes);
 app.use("/api/chefs", chefRoutes);
