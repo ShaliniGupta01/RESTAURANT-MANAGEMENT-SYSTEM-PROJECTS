@@ -40,7 +40,7 @@ export const getAnalytics = async (req, res) => {
     const getCount = (key) =>
       statusAgg.find((s) => s._id === key.toLowerCase())?.count || 0;
 
-    // ✅ Combine both “served” and “done” as “served”
+    //  Combine both “served” and “done” as “served”
     const servedCount = getCount("served") + getCount("done");
 
     // --- Construct order summary ---

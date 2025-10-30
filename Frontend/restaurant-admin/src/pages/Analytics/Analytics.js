@@ -1,5 +1,3 @@
-
-
 import React, {
   useEffect,
   useState,
@@ -93,41 +91,38 @@ const Analytics = forwardRef((props, ref) => {
     },
   }));
 
-  // 🔹 Fetch when page loads or filter changes
+  //  Fetch when page loads or filter changes
   useEffect(() => {
     fetchAnalyticsData(filter);
   }, [filter, fetchAnalyticsData]);
 
-  // 🔹 Blur logic (Search)
-  const getBlurClass = (section) => {
-    if (!searchTerm) return ""; // nothing blurred if input empty
-    const term = searchTerm.toLowerCase().trim();
+//  Blur logic (Search)
+const getBlurClass = (section) => {
+  if (!searchTerm) return ""; // show all if empty
 
-    if (section === "chef") return ""; // never blur chefs
+  const term = searchTerm.toLowerCase().trim();
 
-    if (
-      term.includes("total") ||
-      term.includes("revenue") ||
-      term.includes("orders") ||
-      term.includes("clients")
-    ) {
-      return section === "stats" ? "" : "blurred";
-    }
+  // --- Only StatsRow should show for "total" type searches ---
+  if (
+    term === "total" ||
+    term.includes("total chef") ||
+    term.includes("total order") ||
+    term.includes("total revenue") ||
+    term.includes("total client") ||
+    term.includes("total clients")
+  ) {
+    return section === "stats" ? "" : "blurred";
+  }
 
-    if (term.includes("order") || term.includes("summary")) {
-      return section === "orderSummary" ? "" : "blurred";
-    }
+  // --- Other section-specific searches ---
+  if (term.includes("ordersummary")) return section === "orderSummary" ? "" : "blurred";
+  if (term.includes("revenue chart")) return section === "revenueChart" ? "" : "blurred";
+  if (term.includes("tables") || term.includes("table")) return section === "tablesOverview" ? "" : "blurred";
+  if (term.includes("chef")) return section === "chef" ? "" : "blurred";
 
-    if (term.includes("revenue")) {
-      return section === "revenueChart" ? "" : "blurred";
-    }
-
-    if (term.includes("table") || term.includes("tables")) {
-      return section === "tablesOverview" ? "" : "blurred";
-    }
-
-    return "blurred";
-  };
+  // Default: show all
+  return "";
+};
 
   return (
     <div className="analytics-page">

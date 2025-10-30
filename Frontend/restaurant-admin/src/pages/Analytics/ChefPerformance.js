@@ -4,9 +4,9 @@ import "./ChefPerformance.css";
 const ChefPerformance = React.forwardRef((props, ref) => {
   const [chefs, setChefs] = useState([
     { name: "Mohan", orders: 0 },
-    { name: "Pritam", orders: 0 },
-    { name: "Yash", orders: 0 },
     { name: "Rahul", orders: 0 },
+    { name: "Yogesh", orders: 0 },
+    { name: "Satyaram", orders: 0 },
   ]);
 
   const chefIndex = useRef(0); // tracks next chef for assignment
