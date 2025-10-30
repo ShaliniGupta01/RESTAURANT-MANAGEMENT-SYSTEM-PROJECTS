@@ -35,6 +35,8 @@ app.use(
   })
 );
 
+ app.options(/.*/, cors());
+
 
 // Middleware
 app.use(morgan("dev"));
