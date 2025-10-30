@@ -15,7 +15,9 @@ export default function AddProduct() {
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  //  Handle image preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -24,8 +26,24 @@ export default function AddProduct() {
     }
   };
 
+  //  Handle form field changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  //  Handle form submission
   const submit = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!form.name || !form.price || !form.category) {
+      alert(" Please fill all required fields!");
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("name", form.name);
@@ -37,11 +55,14 @@ export default function AddProduct() {
       formData.append("rating", form.rating);
       if (image) formData.append("image", image);
 
-      await API.post("/menu", formData, {
+      //  Correct backend endpoint: /api/menu
+      await API.post("/api/menu", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // alert(" Product Added Successfully!");
+      alert("Product added successfully!");
+
+      //  Reset form
       setForm({
         name: "",
         description: "",
@@ -54,7 +75,10 @@ export default function AddProduct() {
       setImage(null);
       setPreview(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to add product");
+      console.error("Error adding product:", err);
+      alert(err.response?.data?.message || " Failed to add product");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,39 +88,51 @@ export default function AddProduct() {
         <h2>Add Product</h2>
 
         <form className="add-product-form" onSubmit={submit}>
+          {/* Image Upload */}
           <div className="image-upload">
             {preview ? (
               <img src={preview} alt="Preview" className="preview-img" />
             ) : (
               <div className="upload-box">Upload Image</div>
             )}
-            <input type="file" accept="image/*" onChange={handleImageChange} className="file-input" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="file-input"
+            />
           </div>
+
+          {/* Form Inputs */}
+          <input
+            required
+            name="name"
+            placeholder="Product Name"
+            value={form.name}
+            onChange={handleChange}
+          />
 
           <input
             required
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-
-          <input
             type="number"
+            name="price"
             placeholder="Price"
             value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            onChange={handleChange}
           />
 
           <textarea
+            name="description"
             placeholder="Description"
             value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            onChange={handleChange}
           />
 
           <select
             required
+            name="category"
             value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            onChange={handleChange}
           >
             <option value="">Select Category</option>
             <option value="Burger">Burger</option>
@@ -108,15 +144,17 @@ export default function AddProduct() {
 
           <input
             type="text"
+            name="averagePreparationTime"
             placeholder="Average Prep Time (e.g. 20 mins)"
             value={form.averagePreparationTime}
-            onChange={(e) => setForm({ ...form, averagePreparationTime: e.target.value })}
+            onChange={handleChange}
           />
 
           <select
             required
+            name="inStock"
             value={form.inStock}
-            onChange={(e) => setForm({ ...form, inStock: e.target.value })}
+            onChange={handleChange}
           >
             <option value="">In Stock?</option>
             <option value="Yes">Yes</option>
@@ -125,16 +163,18 @@ export default function AddProduct() {
 
           <input
             type="number"
-            placeholder="Rating (1-5)"
+            name="rating"
+            placeholder="Rating (1–5)"
             value={form.rating}
-            onChange={(e) => setForm({ ...form, rating: e.target.value })}
+            onChange={handleChange}
           />
 
-          <button type="submit">Add Product</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Adding..." : "Add Product"}
+          </button>
         </form>
       </div>
     </div>
   );
 }
-
 

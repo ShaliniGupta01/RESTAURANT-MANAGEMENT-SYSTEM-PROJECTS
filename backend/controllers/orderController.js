@@ -23,6 +23,7 @@ export const getOrders = async (req, res) => {
   }
 };
 
+
 // Create new order
 export const createOrder = async (req, res) => {
   try {
@@ -112,3 +113,4 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

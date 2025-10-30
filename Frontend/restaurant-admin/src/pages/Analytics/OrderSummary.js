@@ -40,7 +40,7 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
 
   const pieData = useMemo(
     () => [
-      { name: "Dine In", value: dineIn, color: "#2C2C2C" },
+   { name: "Dine In", value: dineIn, color: "#2C2C2C" },
       { name: "Take Away", value: takeAway, color: "#5B5B5B" },
       { name: "Served", value: served, color: "#828282" },
     ],
@@ -53,12 +53,9 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
         <p className="placeholder-text">Orders distribution overview</p>
         <TimeFilter selected={filter} setSelected={setFilter} />
       </div>
-
-      {/*  Light grey divider under header */}
       <hr className="chart-divider" />
-
       <div className="order-summary-content">
-        {/* === Order Count Boxes === */}
+        {/* Order Count */}
         <div className="order-count-cards">
           <div className="order-count-card white-bg">
             <span className="count-value">{String(served).padStart(2, "0")}</span>
@@ -75,16 +72,10 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
         </div>
 
         <div className="order-pie-and-metrics">
-          {/* === Pie Chart === */}
+          {/* Pie Chart */}
           <ResponsiveContainer width="30%" height={100}>
             <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={45}
-                innerRadius={35}
-              >
+              <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={45} innerRadius={35}>
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -92,8 +83,8 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
             </PieChart>
           </ResponsiveContainer>
 
-          {/* === Metrics Progress Bars === */}
-          <div className="metrics-list">
+          {/* Progress Metrics */}
+           <div className="metrics-list">
             <OrderMetric
               name="Take Away"
               value={takeAway}

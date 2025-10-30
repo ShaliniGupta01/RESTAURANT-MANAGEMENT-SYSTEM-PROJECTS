@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import CartSummary from "../../components/CartSummary/Cart";
@@ -19,16 +17,16 @@ export default function Checkout() {
   const [tables, setTables] = useState([]);
   const [search, setSearch] = useState("");
 
-  // Fetch tables
+  // Fetch tables from backend
   useEffect(() => {
     api
-      .get("/tables")
+      .get("/api/tables")
       .then((res) => {
         const t = Array.isArray(res.data) ? res.data : res.data.tables || [];
         setTables(t);
       })
-      .catch(() => {
-        // fallback mock tables
+      .catch((err) => {
+        console.warn(" Could not fetch tables, using mock data.", err.message);
         setTables(
           Array.from({ length: 30 }, (_, i) => ({
             tableNumber: i + 1,
@@ -39,17 +37,16 @@ export default function Checkout() {
       });
   }, []);
 
-  // Persist cart
+  // Persist cart to localStorage
   useEffect(() => {
     localStorage.setItem("rms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Update quantity
+  //  Update quantity
   const updateQty = (id, delta) => {
     setCart((prev) => {
-      const p = prev.find((x) => x.id === id);
-      if (!p && delta > 0)
-        return [...prev, { id, name: "Item", price: 0, qty: delta }];
+      const item = prev.find((x) => x.id === id);
+      if (!item && delta > 0) return [...prev, { id, name: "Item", price: 0, qty: delta }];
 
       const updated = prev
         .map((x) =>
@@ -58,25 +55,19 @@ export default function Checkout() {
         .filter((x) => x.qty > 0);
 
       if (updated.length === 0) navigate("/");
-
       return updated;
     });
   };
 
-  // Calculate totals
+  //  Totals
   const computeTotals = () => {
-    const itemsTotal = cart.reduce((s, c) => s + c.qty * c.price, 0);
+    const itemsTotal = cart.reduce((sum, c) => sum + c.qty * c.price, 0);
     const delivery = orderType === "Take Away" ? 50 : 0;
-    const taxes = 5;
-    return {
-      itemsTotal,
-      delivery,
-      taxes,
-      grandTotal: itemsTotal + delivery + taxes,
-    };
+    const taxes = Math.round(itemsTotal * 0.05);
+    return { itemsTotal, delivery, taxes, grandTotal: itemsTotal + delivery + taxes };
   };
 
-  // Find available table
+  //  Find available table
   const findTable = () => {
     const members = user?.members || 1;
     const sizes = [2, 4, 6, 8];
@@ -88,30 +79,27 @@ export default function Checkout() {
     return null;
   };
 
-  // Place order
+  //  Place order
   const handlePlaceOrder = async () => {
-    if (cart.length === 0) {
-      alert("Your cart is empty!");
-      return;
-    }
+    if (cart.length === 0) return alert(" Your cart is empty!");
 
     let tableNumber = null;
+
     if (orderType === "Dine In") {
       const table = findTable();
-      if (!table) {
-        alert("All tables are full. Please wait.");
-        return;
-      }
+      if (!table) return alert(" All tables are full. Please wait.");
+
       tableNumber = table.tableNumber;
       setTables((prev) =>
         prev.map((t) =>
           t.tableNumber === table.tableNumber ? { ...t, reserved: true } : t
         )
       );
+
       try {
-        await api.patch(`/tables/${table.tableNumber}`, { reserved: true });
+        await api.patch(`/api/tables/${table.tableNumber}`, { reserved: true });
       } catch {
-        console.warn("Table reservation failed, proceeding locally.");
+        console.warn(" Table reservation failed on server, proceeding locally.");
       }
     }
 
@@ -124,7 +112,7 @@ export default function Checkout() {
         name: item.name,
         quantity: item.qty,
         price: item.price,
-        image: item.image || "", //  Include image if exists
+        image: item.image || "",
       })),
       totalAmount: totals.grandTotal,
       clientName: user?.name || "Guest",
@@ -136,9 +124,9 @@ export default function Checkout() {
     };
 
     try {
-      const res = await api.post("/orders", orderData);
+      const res = await api.post("/api/orders", orderData);
       if (res.status === 201 || res.status === 200) {
-        alert("Order placed successfully!");
+        alert(" Order placed successfully!");
         localStorage.removeItem("rms_cart");
         setCart([]);
         navigate("/thankyou");
@@ -149,7 +137,6 @@ export default function Checkout() {
     }
   };
 
-  // Dynamic greeting
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "morning";
@@ -159,7 +146,6 @@ export default function Checkout() {
 
   return (
     <div className="checkout-shell">
-      {/* Header greeting */}
       <header className="home-header">
         <div className="greet">
           <div className="greet-large">Good {greeting}</div>
@@ -167,10 +153,8 @@ export default function Checkout() {
         </div>
       </header>
 
-      {/* Search bar */}
       <SearchBar value={search} onChange={setSearch} />
 
-      {/* Cart items */}
       <div className="cart-items">
         {cart.map((it) => (
           <div className="cart-item" key={it.id}>
@@ -199,7 +183,6 @@ export default function Checkout() {
         ))}
       </div>
 
-      {/* Add cooking instructions */}
       <div style={{ marginTop: 10 }}>
         <button className="add-instruction" onClick={() => setCookVisible(true)}>
           Add cooking instructions (optional)
@@ -212,7 +195,6 @@ export default function Checkout() {
         </div>
       )}
 
-      {/* Dine In / Take Away toggle */}
       <div className={`order-type ${orderType === "Take Away" ? "swap" : ""}`}>
         <button
           className={orderType === "Dine In" ? "active" : ""}
@@ -228,7 +210,6 @@ export default function Checkout() {
         </button>
       </div>
 
-      {/* Swipe-to-order summary */}
       <CartSummary
         cart={cart}
         user={user}
@@ -236,7 +217,6 @@ export default function Checkout() {
         onPlaceOrder={handlePlaceOrder}
       />
 
-      {/* Cooking instruction modal */}
       <CookingInstruction
         visible={cookVisible}
         onClose={() => setCookVisible(false)}
@@ -245,4 +225,3 @@ export default function Checkout() {
     </div>
   );
 }
-

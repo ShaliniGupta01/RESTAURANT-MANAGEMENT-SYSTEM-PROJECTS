@@ -1,13 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from "react";
-import Category from "../../components/Category/Categorymenu";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import FoodCard from "../../components/FoodCard/FoodCard";
-import UserDetails from "../../components/Details/UserDetails";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import UserDetails from "../../components/Details/UserDetails";
+import Categorymenu from "../../components/Category/Categorymenu";
 
 const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
-
 const BASE_URL = "https://restaurant-backend-1rky.onrender.com";
 
 export default function Home() {
@@ -24,10 +24,11 @@ export default function Home() {
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("rms_cart")) || []
   );
+
   const perPage = 8;
   const listRef = useRef();
 
-  //  Match category (handles spacing and plural forms)
+  //  Match category name loosely
   const matchCategory = (catFromDB, selectedCat) => {
     if (!catFromDB || !selectedCat) return false;
     const c1 = catFromDB.toLowerCase().replace(/\s+/g, "");
@@ -41,7 +42,7 @@ export default function Home() {
     );
   };
 
-  //  Fetch menu items from backend
+  //  Fetch menu items from backend only
   useEffect(() => {
     const fetchMenu = async () => {
       try {
@@ -64,16 +65,36 @@ export default function Home() {
               .filter((i) => matchCategory(i.category, selected))
               .slice(0, perPage)
           );
+        } else {
+          console.error(" No menu data found from backend");
+          setItems([]);
+          setVisibleItems([]);
         }
       } catch (err) {
         console.error(" Error fetching menu:", err);
+        setItems([]);
+        setVisibleItems([]);
       }
     };
 
     fetchMenu();
   }, [selected]);
 
-  // Search + Category filter
+  //  Auto-switch category if search matches one
+  useEffect(() => {
+    if (!search) return;
+    const foundCategory = CATEGORIES.find(
+      (cat) =>
+        cat.toLowerCase().replace(/\s+/g, "") ===
+          search.toLowerCase().replace(/\s+/g, "") ||
+        cat.toLowerCase().includes(search.toLowerCase())
+    );
+    if (foundCategory && foundCategory !== selected) {
+      setSelected(foundCategory);
+    }
+  }, [search]);
+
+  //  Search + Category filter logic
   useEffect(() => {
     const filtered = items.filter(
       (i) =>
@@ -83,19 +104,21 @@ export default function Home() {
     setVisibleItems(filtered.slice(0, perPage));
   }, [selected, items, search]);
 
-  // Persist cart in localStorage
+  //  Persist cart in localStorage
   useEffect(() => {
     localStorage.setItem("rms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Add / Remove items from cart
+  //  Add or remove item
   const onAdd = (item, delta) => {
     setCart((prev) => {
-      const exists = prev.find((p) => p._id === item._id);
+      const exists = prev.find(
+        (p) => p._id === item._id && p.name === item.name
+      );
       if (exists) {
         const updated = prev
           .map((p) =>
-            p._id === item._id
+            p._id === item._id && p.name === item.name
               ? { ...p, qty: Math.max(0, p.qty + delta) }
               : p
           )
@@ -117,7 +140,8 @@ export default function Home() {
     });
   };
 
-  const qtyOf = (id) => cart.find((c) => c._id === id)?.qty || 0;
+  const qtyOf = (id, name) =>
+    cart.find((c) => c._id === id && c.name === name)?.qty || 0;
 
   // Infinite scroll
   const loadMore = () => {
@@ -144,56 +168,73 @@ export default function Home() {
   };
 
   return (
-    <div className="home-shell">
-      <UserDetails visible={showDetails} onSave={handleDetailsSave} />
-
-      <header className="home-header">
-        <div className="greet">
-          <div className="greet-large">
-            Good{" "}
-            {(() => {
-              const h = new Date().getHours();
-              if (h < 12) return "morning";
-              if (h < 17) return "afternoon";
-              return "evening";
-            })()}
+    <>
+      <div className={`home-shell ${showDetails ? "modal-active" : ""}`}>
+        <header className="home-header">
+          <div className="greet">
+            <div className="greet-large">
+              Good{" "}
+              {(() => {
+                const h = new Date().getHours();
+                if (h < 12) return "morning";
+                if (h < 17) return "afternoon";
+                return "evening";
+              })()}
+            </div>
+            <div className="greet-small">Place your order here</div>
           </div>
-          <div className="greet-small">Place your order here</div>
+        </header>
+
+        {/*  Search + total */}
+        <div className="search-row">
+          <SearchBar value={search} onChange={setSearch} />
+          <div className="cart-total">
+            ₹{cart.reduce((s, c) => s + c.qty * c.price, 0)}
+          </div>
         </div>
-      </header>
 
-      <div className="search-row">
-        <SearchBar value={search} onChange={setSearch} />
-        <div className="cart-total">
-          ₹{cart.reduce((s, c) => s + c.qty * c.price, 0)}
-        </div>
-      </div>
-
-      <Category
-        categories={categories}
-        selected={selected}
-        onSelect={setSelected}
-      />
-
-      <div className="category-title">{selected}</div>
-
-      <div className="items-grid" onScroll={onScroll} ref={listRef}>
-        {visibleItems.map((it) => (
-          <FoodCard
-            key={it._id}
-            item={it}
-            qty={qtyOf(it._id)}
-            onChangeQty={onAdd}
+        {/*  Category menu */}
+        {(!search ||
+          !CATEGORIES.some((cat) =>
+            cat.toLowerCase().includes(search.toLowerCase())
+          )) && (
+          <Categorymenu
+            categories={categories}
+            selected={selected}
+            onSelect={setSelected}
           />
-        ))}
+        )}
+
+        <div className="category-title">{selected}</div>
+
+        {/*  Food list */}
+        <div className="items-grid" onScroll={onScroll} ref={listRef}>
+          {visibleItems.length > 0 ? (
+            visibleItems.map((it) => (
+              <FoodCard
+                key={`${it._id}-${it.name}`}
+                item={it}
+                qty={qtyOf(it._id, it.name)}
+                onChangeQty={onAdd}
+              />
+            ))
+          ) : (
+            <div className="no-results">No items found.</div>
+          )}
+        </div>
+
+        {/*  Checkout */}
+        <div className="next-fixed">
+          <button className="btn-next" onClick={() => navigate("/checkout")}>
+            Next
+          </button>
+        </div>
       </div>
 
-      <div className="next-fixed">
-        <button className="btn-next" onClick={() => navigate("/checkout")}>
-          Next
-        </button>
-      </div>
-    </div>
+      {/*  User details modal */}
+      {showDetails && (
+        <UserDetails visible={showDetails} onSave={handleDetailsSave} />
+      )}
+    </>
   );
 }
-

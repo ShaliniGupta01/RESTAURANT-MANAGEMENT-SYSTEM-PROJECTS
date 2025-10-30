@@ -3,16 +3,33 @@ import { FaUtensils, FaClock, FaCheckCircle } from "react-icons/fa";
 import "./OrderCard.css";
 
 export default function OrderCard({ order, onUpdate }) {
-  const [status, setStatus] = useState(order?.status || "Ongoing");
+  // Use localStorage to persist status across refreshes
+  const getStoredStatus = () => {
+    const stored = localStorage.getItem(`order_${order?._id}_status`);
+    return stored || order?.status || "Ongoing";
+  };
+
+  const [status, setStatus] = useState(getStoredStatus());
 
   useEffect(() => {
-    setStatus(order?.status || "Ongoing");
-  }, [order?.status]);
+    // Only update from prop if not already "Served" in localStorage
+    const storedStatus = localStorage.getItem(`order_${order?._id}_status`);
+    if (!storedStatus || storedStatus !== "Served") {
+      setStatus(order?.status || "Ongoing");
+    }
+  }, [order?.status, order?._id]);
 
   const isTakeaway = order?.type === "Takeaway" || order?.orderType === "Takeaway";
 
   const handleProcessingClick = () => {
+    if (isTakeaway || status === "Served") return;
+
+    // Update immediately in UI
     setStatus("Served");
+    // Store in localStorage to persist across refreshes
+    localStorage.setItem(`order_${order._id}_status`, "Served");
+
+    // Call onUpdate to handle the update in parent
     if (onUpdate) onUpdate(order?._id, "Served");
   };
 

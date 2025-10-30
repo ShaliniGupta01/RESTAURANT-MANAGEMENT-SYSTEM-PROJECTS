@@ -15,21 +15,21 @@ export default function Tables() {
   // Fetch all tables
   const fetchTables = async () => {
     try {
-      const res = await API.get("/tables");
+      const res = await API.get("/api/tables"); 
       if (Array.isArray(res.data)) setTables(res.data);
-      else if (res.data.tables) setTables(res.data.tables);
-      else setTables(res.data || []);
+      else if (Array.isArray(res.data.tables)) setTables(res.data.tables);
+      else setTables([]);
     } catch (err) {
       console.error("Error fetching tables:", err);
       setTables([]);
     }
   };
 
-  // Add a table (POST)
+  // Add a new table
   const addTable = async (payload) => {
     try {
       setLoading(true);
-      const res = await API.post("/tables", payload);
+      const res = await API.post("/api/tables", payload); 
       setTables((prev) => [...prev, res.data]);
       setShowModal(false);
     } catch (err) {
@@ -40,10 +40,10 @@ export default function Tables() {
     }
   };
 
-  // Delete table
+  // Delete a table
   const deleteTable = async (id) => {
     try {
-      await API.delete(`/tables/${id}`);
+      await API.delete(`/api/tables/${id}`); 
       setTables((prev) => prev.filter((t) => t._id !== id));
     } catch (err) {
       console.error("Error deleting table:", err);
@@ -56,30 +56,33 @@ export default function Tables() {
       <h2>Tables</h2>
 
       <div className="tables-grid">
-        {tables.map((t) => (
-          <div key={t._id} className="table-card">
-            <button
-              className="delete-icon"
-              onClick={() => deleteTable(t._id)}
-              title="Delete Table"
-            >
-              <FaTrashAlt />
-            </button>
+        {tables.length > 0 ? (
+          tables.map((t) => (
+            <div key={t._id} className="table-card">
+              <button
+                className="delete-icon"
+                onClick={() => deleteTable(t._id)}
+                title="Delete Table"
+              >
+                <FaTrashAlt />
+              </button>
 
-            {/* Updated order: Name first, number second */}
-            <div className="table-name">{t.tableName || "Table"}</div>
-            <div className="table-number">
-              {String(t.tableNumber).padStart(2, "0")}
-            </div>
+              <div className="table-name">{t.tableName || "Table"}</div>
+              <div className="table-number">
+                {String(t.tableNumber).padStart(2, "0")}
+              </div>
 
-            <div className="table-footer">
-              <FaChair className="chair-icon" />
-              <span className="chair-count">
-                {t.size?.toString().padStart(2, "0")}
-              </span>
+              <div className="table-footer">
+                <FaChair className="chair-icon" />
+                <span className="chair-count">
+                  {t.size?.toString().padStart(2, "0")}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="no-tables-text">No tables available</p>
+        )}
 
         {/* Add Table Button */}
         <div className="add-table-card" onClick={() => setShowModal(true)}>
@@ -143,5 +146,3 @@ function CreateTable({ onCreate, onCancel, loading }) {
     </div>
   );
 }
-
-
