@@ -8,6 +8,7 @@ export const getAnalytics = async (req, res) => {
     // --- Basic Stats ---
     const totalOrders = await Order.countDocuments();
     const totalChefs = await Chef.countDocuments();
+
     const totalRevenueAgg = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
@@ -20,24 +21,31 @@ export const getAnalytics = async (req, res) => {
     const takeAway = await Order.countDocuments({ type: "Take Away" });
 
     // --- Revenue by Date (for chart) ---
-    const revenue = await Order.aggregate([
+    const revenueAgg = await Order.aggregate([
       {
         $group: {
           _id: {
             $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
           },
-          total: { $sum: "$totalAmount" },
+          value: { $sum: "$totalAmount" },
         },
       },
       { $sort: { _id: 1 } },
     ]);
 
+    // ✅ Format revenue data for frontend chart
+    const revenue = revenueAgg.map((r) => ({
+      name: r._id,
+      value: r.value,
+    }));
+
     // --- Final Response ---
     res.json({
       stats: {
-        totalRevenue,
         totalOrders,
-        totalClients: totalOrders, // you can change this if client model exists
+        totalChefs,
+        totalRevenue,
+        totalClients: totalOrders, // optional
       },
       orders: {
         served,
@@ -48,6 +56,9 @@ export const getAnalytics = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching analytics:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
