@@ -2,7 +2,6 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  useRef,
   forwardRef,
   useImperativeHandle,
 } from "react";
@@ -15,7 +14,6 @@ import TablesOverview from "./TablesOverview";
 import ChefPerformance from "./ChefPerformance";
 import { useSearch } from "../../context/SearchContext";
 
-// forwardRef so parent (AdminDashboard) can call refresh()
 const Analytics = forwardRef((props, ref) => {
   const { searchTerm } = useSearch();
 
@@ -37,10 +35,9 @@ const Analytics = forwardRef((props, ref) => {
   const [filter, setFilter] = useState("Daily");
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Generate random chef performance (mock logic)
+  // 🔹 Generate mock chef performance data
   const generateChefPerformance = useCallback((totalOrders = 20) => {
     const chefs = ["Mohan", "Pritam", "Yash", "Rahul"];
-
     const performance = chefs.map((chef) => ({
       name: chef,
       totalOrders: 0,
@@ -62,7 +59,7 @@ const Analytics = forwardRef((props, ref) => {
     return performance;
   }, []);
 
-  // 🔹 Fetch analytics from backend
+  // 🔹 Fetch analytics data from backend
   const fetchAnalyticsData = useCallback(
     async (selectedFilter = filter) => {
       try {
@@ -85,60 +82,56 @@ const Analytics = forwardRef((props, ref) => {
     [generateChefPerformance, filter]
   );
 
-  // 🔹 Allow parent (AdminDashboard) to trigger a refresh instantly
+  // 🔹 Expose refresh() to parent (if needed)
   useImperativeHandle(ref, () => ({
     refresh() {
       fetchAnalyticsData(filter);
     },
   }));
 
-  const analyticsRef = useRef();
-
-// Function to reload analytics when order status changes
-const handleOrderStatusChange = () => {
-  analyticsRef.current?.refresh(); // instantly refresh analytics
-};
-
-
-useEffect(() => {
-  fetchAnalyticsData(filter);
-
-  // Auto-refresh every 10s
-  const interval = setInterval(() => {
+  // ✅ Called when an order’s status changes (Processing → Served)
+  const handleOrderStatusChange = () => {
+    console.log("Refreshing analytics after serve...");
     fetchAnalyticsData(filter);
-  }, 10000);
+  };
 
-  return () => clearInterval(interval);
-}, [filter, fetchAnalyticsData]);
+  useEffect(() => {
+    fetchAnalyticsData(filter);
 
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchAnalyticsData(filter);
+    }, 10000);
 
-//  Blur logic (Search)
-const getBlurClass = (section) => {
-  if (!searchTerm) return ""; // show all if empty
+    return () => clearInterval(interval);
+  }, [filter, fetchAnalyticsData]);
 
-  const term = searchTerm.toLowerCase().trim();
+  // 🔹 Search-based blur logic
+  const getBlurClass = (section) => {
+    if (!searchTerm) return "";
 
-  // --- Only StatsRow should show for "total" type searches ---
-  if (
-    term === "total" ||
-    term.includes("total chef") ||
-    term.includes("total order") ||
-    term.includes("total revenue") ||
-    term.includes("total client") ||
-    term.includes("total clients")
-  ) {
-    return section === "stats" ? "" : "blurred";
-  }
+    const term = searchTerm.toLowerCase().trim();
+    if (
+      term === "total" ||
+      term.includes("total chef") ||
+      term.includes("total order") ||
+      term.includes("total revenue") ||
+      term.includes("total client") ||
+      term.includes("total clients")
+    ) {
+      return section === "stats" ? "" : "blurred";
+    }
 
-  // --- Other section-specific searches ---
-  if (term.includes("ordersummary")) return section === "orderSummary" ? "" : "blurred";
-  if (term.includes("revenue chart")) return section === "revenueChart" ? "" : "blurred";
-  if (term.includes("tables") || term.includes("table")) return section === "tablesOverview" ? "" : "blurred";
-  if (term.includes("chef")) return section === "chef" ? "" : "blurred";
+    if (term.includes("ordersummary"))
+      return section === "orderSummary" ? "" : "blurred";
+    if (term.includes("revenue chart"))
+      return section === "revenueChart" ? "" : "blurred";
+    if (term.includes("tables") || term.includes("table"))
+      return section === "tablesOverview" ? "" : "blurred";
+    if (term.includes("chef")) return section === "chef" ? "" : "blurred";
 
-  // Default: show all
-  return "";
-};
+    return "";
+  };
 
   return (
     <div className="analytics-page">
@@ -153,13 +146,12 @@ const getBlurClass = (section) => {
       <div className="analytics-grid">
         <div className={getBlurClass("orderSummary")}>
           <OrderSummary
-             ref={analyticsRef}
             served={orders?.served || 0}
             dineIn={orders?.dineIn || 0}
             takeAway={orders?.takeAway || 0}
             filter={filter}
             setFilter={setFilter}
-             onOrderStatusChange={handleOrderStatusChange}
+            onOrderStatusChange={handleOrderStatusChange} // ✅ key line
           />
         </div>
 
@@ -176,7 +168,7 @@ const getBlurClass = (section) => {
         </div>
       </div>
 
-      {/* === Chef Performance (never blurred) === */}
+      {/* === Chef Performance === */}
       <div className={getBlurClass("chef")}>
         <ChefPerformance chefPerformance={chefPerformance} />
       </div>
