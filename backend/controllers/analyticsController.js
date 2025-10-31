@@ -3,62 +3,81 @@ import Chef from "../models/chefModel.js";
 
 export const getAnalytics = async (req, res) => {
   try {
-    const { filter } = req.query;
-
     // --- Basic Stats ---
     const totalOrders = await Order.countDocuments();
     const totalChefs = await Chef.countDocuments();
 
-    const totalRevenueAgg = await Order.aggregate([
+    const revenueAgg = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
-    const totalRevenue =
-      totalRevenueAgg.length > 0 ? totalRevenueAgg[0].total : 0;
+    const totalRevenue = revenueAgg[0]?.total || 0;
 
-    // --- Order Type Counts ---
-    const served = await Order.countDocuments({ status: "Served" });
-    const dineIn = await Order.countDocuments({ type: "Dine In" });
-    const takeAway = await Order.countDocuments({ type: "Take Away" });
+    const totalClients = await Order.distinct("phoneNumber").then((arr) =>
+      arr.filter(Boolean).length
+    );
 
-    // --- Revenue by Date (for chart) ---
-    const revenueAgg = await Order.aggregate([
+    // --- Status Breakdown ---
+    const statusAgg = await Order.aggregate([
       {
         $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
-          },
-          value: { $sum: "$totalAmount" },
+          _id: { $toLower: { $trim: { input: "$status" } } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // --- Type Breakdown ---
+    const typeAgg = await Order.aggregate([
+      {
+        $group: {
+          _id: { $toLower: { $trim: { input: "$type" } } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // ✅ Correct Served Logic
+    // Count all orders where status = "Served" OR status = "Done"
+    const servedCount = await Order.countDocuments({
+      $or: [{ status: /served/i }, { status: /done/i }],
+    });
+
+    // ✅ Build Orders Summary
+    const orders = {
+      served: servedCount,
+      processing:
+        statusAgg.find((s) => s._id === "processing")?.count || 0,
+      dineIn:
+        typeAgg.find((t) => t._id.includes("dine"))?.count || 0,
+      takeAway:
+        typeAgg.find((t) => t._id.includes("take"))?.count || 0,
+    };
+
+    // ✅ Revenue Series for Chart
+    const revenueSeries = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          total: { $sum: "$totalAmount" },
         },
       },
       { $sort: { _id: 1 } },
+      { $limit: 30 },
     ]);
 
-    // ✅ Format revenue data for frontend chart
-    const revenue = revenueAgg.map((r) => ({
+    const revenue = revenueSeries.map((r) => ({
       name: r._id,
-      value: r.value,
+      value: r.total,
     }));
 
-    // --- Final Response ---
+    // ✅ Final Response
     res.json({
-      stats: {
-        totalOrders,
-        totalChefs,
-        totalRevenue,
-        totalClients: totalOrders, // optional
-      },
-      orders: {
-        served,
-        dineIn,
-        takeAway,
-      },
+      stats: { totalOrders, totalChefs, totalRevenue, totalClients },
+      orders,
       revenue,
     });
   } catch (error) {
-    console.error("Error fetching analytics:", error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    console.error("Error in getAnalytics:", error);
+    res.status(500).json({ message: error.message });
   }
 };
