@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import api from "../../api/axios";
 import "./UserDetails.css";
 
-export default function UserDetails({ visible, onSave }) {
+export default function UserDetails({ visible, onSave, totalAmount = 0 }) {
   const [name, setName] = useState("");
   const [members, setMembers] = useState(2);
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // ✅ Load saved details
   useEffect(() => {
     const local = JSON.parse(localStorage.getItem("rms_user"));
     if (local) {
@@ -23,23 +24,22 @@ export default function UserDetails({ visible, onSave }) {
 
   const handleMembersChange = (e) => {
     const val = e.target.value;
-    if (val === "") {
-      setMembers("");
-      return;
-    }
+    if (val === "") return setMembers("");
     const num = Number(val);
-    if (num >= 1 && num <= 8) {
-      setMembers(num);
-    }
+    if (num >= 1 && num <= 8) setMembers(num);
   };
 
   const handleSave = async () => {
-    if (!name || !phone) {
-      alert("Please provide name and contact");
+    if (!name.trim() || !phone.trim()) {
+      alert("⚠️ Please provide your name and contact number.");
+      return;
+    }
+    if (!/^[0-9]{10}$/.test(phone.trim())) {
+      alert("📞 Please enter a valid 10-digit phone number.");
       return;
     }
     if (members < 1 || members > 8) {
-      alert("Members must be between 1 and 8");
+      alert("👥 Members must be between 1 and 8.");
       return;
     }
 
@@ -47,13 +47,12 @@ export default function UserDetails({ visible, onSave }) {
 
     setSaving(true);
     try {
-      await api.post("/users", user);
-    } catch (err) {
-      // ignore backend save errors
+      // Optional API save — ignore if server offline
+      await api.post("/users", user).catch(() => {});
+      localStorage.setItem("rms_user", JSON.stringify(user));
+      onSave?.(user);
     } finally {
       setSaving(false);
-      localStorage.setItem("rms_user", JSON.stringify(user));
-      onSave(user);
     }
   };
 
@@ -73,7 +72,7 @@ export default function UserDetails({ visible, onSave }) {
         </div>
 
         <div className="form-group">
-          <label>Number of Person</label>
+          <label>Number of Persons</label>
           <input
             type="number"
             min="1"
@@ -95,18 +94,29 @@ export default function UserDetails({ visible, onSave }) {
         </div>
 
         <div className="form-group">
-          <label>Contact</label>
+          <label>Contact Number</label>
           <input
-            type="text"
-            placeholder="Mobile number"
+            type="tel"
+            maxLength="10"
+            placeholder="10-digit mobile number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
         </div>
 
         <div className="dm-actions">
-          {/* ✅ No ₹ total here — just the button */}
-          <button onClick={handleSave} className="btn-save" disabled={saving}>
+          {/* ✅ Show total only if passed from Cart */}
+          {totalAmount > 0 && (
+            <div className="total-display">
+              <strong>Total: ₹{totalAmount.toFixed(2)}</strong>
+            </div>
+          )}
+
+          <button
+            onClick={handleSave}
+            className="btn-save"
+            disabled={saving}
+          >
             {saving ? "Saving..." : "Order Now"}
           </button>
         </div>
