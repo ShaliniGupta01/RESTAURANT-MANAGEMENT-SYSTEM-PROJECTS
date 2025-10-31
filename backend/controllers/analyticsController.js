@@ -36,13 +36,13 @@ export const getAnalytics = async (req, res) => {
       },
     ]);
 
-    // ✅ Correct Served Logic
+    //  Correct Served Logic
     // Count all orders where status = "Served" OR status = "Done"
     const servedCount = await Order.countDocuments({
       $or: [{ status: /served/i }, { status: /done/i }],
     });
 
-    // ✅ Build Orders Summary
+    // Build Orders Summary
     const orders = {
       served: servedCount,
       processing:
@@ -53,7 +53,7 @@ export const getAnalytics = async (req, res) => {
         typeAgg.find((t) => t._id.includes("take"))?.count || 0,
     };
 
-    // ✅ Revenue Series for Chart
+    //  Revenue Series for Chart
     const revenueSeries = await Order.aggregate([
       {
         $group: {
@@ -70,7 +70,7 @@ export const getAnalytics = async (req, res) => {
       value: r.total,
     }));
 
-    // ✅ Final Response
+    // Final Response
     res.json({
       stats: { totalOrders, totalChefs, totalRevenue, totalClients },
       orders,

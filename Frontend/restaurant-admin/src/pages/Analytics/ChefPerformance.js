@@ -3,8 +3,8 @@ import "./ChefPerformance.css";
 
 const ChefPerformance = React.forwardRef((props, ref) => {
   const [chefs, setChefs] = useState([
-    { name: "Mohan", orders: 0 },
-    { name: "Rahul", orders: 0 },
+    { name: "Harpal", orders: 0 },
+    { name: "Kabir ", orders: 0 },
     { name: "Yogesh", orders: 0 },
     { name: "Satyaram", orders: 0 },
   ]);
