@@ -14,6 +14,7 @@ import TablesOverview from "./TablesOverview";
 import ChefPerformance from "./ChefPerformance";
 import { useSearch } from "../../context/SearchContext";
 
+// ✅ forwardRef allows parent (AdminDashboard) to call refresh()
 const Analytics = forwardRef((props, ref) => {
   const { searchTerm } = useSearch();
 
@@ -35,9 +36,10 @@ const Analytics = forwardRef((props, ref) => {
   const [filter, setFilter] = useState("Daily");
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Generate mock chef performance data
+  // 🔹 Generate random chef performance (mock data)
   const generateChefPerformance = useCallback((totalOrders = 20) => {
     const chefs = ["Mohan", "Pritam", "Yash", "Rahul"];
+
     const performance = chefs.map((chef) => ({
       name: chef,
       totalOrders: 0,
@@ -59,7 +61,7 @@ const Analytics = forwardRef((props, ref) => {
     return performance;
   }, []);
 
-  // 🔹 Fetch analytics data from backend
+  // 🔹 Fetch analytics from backend
   const fetchAnalyticsData = useCallback(
     async (selectedFilter = filter) => {
       try {
@@ -74,7 +76,7 @@ const Analytics = forwardRef((props, ref) => {
         setRevenueData(data.revenue || []);
         setChefPerformance(generateChefPerformance(25));
       } catch (error) {
-        console.error("Error fetching analytics data:", error);
+        console.error("❌ Error fetching analytics data:", error);
       } finally {
         setLoading(false);
       }
@@ -82,35 +84,25 @@ const Analytics = forwardRef((props, ref) => {
     [generateChefPerformance, filter]
   );
 
-  // 🔹 Expose refresh() to parent (if needed)
+  // 🔹 Allow parent (AdminDashboard) to trigger a refresh instantly
   useImperativeHandle(ref, () => ({
     refresh() {
       fetchAnalyticsData(filter);
     },
   }));
 
-  // ✅ Called when an order’s status changes (Processing → Served)
-  const handleOrderStatusChange = () => {
-    console.log("Refreshing analytics after serve...");
-    fetchAnalyticsData(filter);
-  };
-
+  // 🔹 Fetch on load or filter change
   useEffect(() => {
     fetchAnalyticsData(filter);
-
-    // Auto-refresh every 10 seconds
-    const interval = setInterval(() => {
-      fetchAnalyticsData(filter);
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, [filter, fetchAnalyticsData]);
 
-  // 🔹 Search-based blur logic
+  // 🔹 Blur logic (for SearchContext)
   const getBlurClass = (section) => {
-    if (!searchTerm) return "";
+    if (!searchTerm) return ""; // show all if empty
 
     const term = searchTerm.toLowerCase().trim();
+
+    // --- Show only StatsRow for "total" searches ---
     if (
       term === "total" ||
       term.includes("total chef") ||
@@ -122,6 +114,7 @@ const Analytics = forwardRef((props, ref) => {
       return section === "stats" ? "" : "blurred";
     }
 
+    // --- Section-specific searches ---
     if (term.includes("ordersummary"))
       return section === "orderSummary" ? "" : "blurred";
     if (term.includes("revenue chart"))
@@ -130,6 +123,7 @@ const Analytics = forwardRef((props, ref) => {
       return section === "tablesOverview" ? "" : "blurred";
     if (term.includes("chef")) return section === "chef" ? "" : "blurred";
 
+    // Default: show all
     return "";
   };
 
@@ -151,7 +145,6 @@ const Analytics = forwardRef((props, ref) => {
             takeAway={orders?.takeAway || 0}
             filter={filter}
             setFilter={setFilter}
-            onOrderStatusChange={handleOrderStatusChange} // ✅ key line
           />
         </div>
 

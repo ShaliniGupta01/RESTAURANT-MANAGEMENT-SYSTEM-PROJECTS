@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { FaAngleDown } from "react-icons/fa6";
 import ChartCard from "../../components/ChartCard";
-import API from "../../api/axios";
 import "./OrderSummary.css";
 
 const TimeFilter = ({ selected, setSelected }) => (
@@ -36,27 +35,7 @@ const OrderMetric = ({ name, value, total, color }) => {
   );
 };
 
-export default function OrderSummary({ refreshKey }) {
-  const [filter, setFilter] = useState("Daily");
-  const [served, setServed] = useState(0);
-  const [dineIn, setDineIn] = useState(0);
-  const [takeAway, setTakeAway] = useState(0);
-
-  const fetchAnalytics = async () => {
-    try {
-      const res = await API.get("/api/analytics");
-      setServed(res.data?.served || 0);
-      setDineIn(res.data?.dineIn || 0);
-      setTakeAway(res.data?.takeAway || 0);
-    } catch (err) {
-      console.error("Failed to fetch analytics:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchAnalytics();
-  }, [refreshKey]); 
-
+export default function OrderSummary({ served = 0, dineIn = 0, takeAway = 0, filter, setFilter }) {
   const totalOrders = served + dineIn + takeAway;
 
   const pieData = useMemo(
@@ -74,9 +53,11 @@ export default function OrderSummary({ refreshKey }) {
         <p className="placeholder-text">Orders distribution overview</p>
         <TimeFilter selected={filter} setSelected={setFilter} />
       </div>
+
       <hr className="chart-divider" />
 
       <div className="order-summary-content">
+        {/* Order Count Cards */}
         <div className="order-count-cards">
           <div className="order-count-card white-bg">
             <span className="count-value">{String(served).padStart(2, "0")}</span>
@@ -92,10 +73,18 @@ export default function OrderSummary({ refreshKey }) {
           </div>
         </div>
 
+        {/* Pie Chart and Metrics */}
         <div className="order-pie-and-metrics">
+          {/* Pie Chart */}
           <ResponsiveContainer width="30%" height={100}>
             <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={45} innerRadius={35}>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={45}
+                innerRadius={35}
+              >
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -103,10 +92,26 @@ export default function OrderSummary({ refreshKey }) {
             </PieChart>
           </ResponsiveContainer>
 
+          {/* Progress Metrics */}
           <div className="metrics-list">
-            <OrderMetric name="Take Away" value={takeAway} total={totalOrders} color="#5B5B5B" />
-            <OrderMetric name="Served" value={served} total={totalOrders} color="#828282" />
-            <OrderMetric name="Dine In" value={dineIn} total={totalOrders} color="#2C2C2C" />
+            <OrderMetric
+              name="Take Away"
+              value={takeAway}
+              total={totalOrders}
+              color="#5B5B5B"
+            />
+            <OrderMetric
+              name="Served"
+              value={served}
+              total={totalOrders}
+              color="#828282"
+            />
+            <OrderMetric
+              name="Dine In"
+              value={dineIn}
+              total={totalOrders}
+              color="#2C2C2C"
+            />
           </div>
         </div>
       </div>

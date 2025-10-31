@@ -3,56 +3,52 @@ import { FaUtensils, FaClock, FaCheckCircle } from "react-icons/fa";
 import "./OrderCard.css";
 import API from "../api/axios";
 
-export default function OrderCard({ order, onStatusChange, onOrderStatusChange }) {
-  // Detect Takeaway or Dine In
+export default function OrderCard({ order, onStatusChange }) {
+  // ✅ Safely get stored status from localStorage
+  const getStoredStatus = () => {
+    const stored = localStorage.getItem(`order_${order?._id}_status`);
+    return stored || order?.status || "Ongoing";
+  };
+
+  const [status, setStatus] = useState(getStoredStatus());
   const isTakeaway =
-    order?.type?.toLowerCase().includes("take") ||
-    order?.orderType?.toLowerCase().includes("take");
+    order?.type === "Takeaway" || order?.orderType === "Takeaway";
 
-  // --- Initial Status ---
-  const [status, setStatus] = useState(order?.status || "Processing");
-
-  // --- Sync UI with backend whenever order updates ---
+  // ✅ Sync status if not already served
   useEffect(() => {
-    setStatus(order?.status || "Processing");
-  }, [order?.status]);
+    const storedStatus = localStorage.getItem(`order_${order?._id}_status`);
+    if (!storedStatus || storedStatus !== "Served") {
+      setStatus(order?.status || "Ongoing");
+    }
+  }, [order?.status, order?._id]);
 
-  // --- Handle Serve Click (for Dine-In orders only) ---
+  // ✅ Handle marking order as "Served"
   const handleProcessingClick = async () => {
-    if (isTakeaway || status === "Served") return; // Takeaway auto-served already
+    if (isTakeaway || status === "Served") return;
+
+    setStatus("Served");
+    localStorage.setItem(`order_${order._id}_status`, "Served");
 
     try {
-      const newStatus = "Served";
-      setStatus(newStatus);
-
       const res = await API.patch(`/api/orders/${order._id}`, {
-        status: newStatus,
+        status: "Served",
       });
-      console.log("Order served successfully:", res.data);
-
-      // Tell parent (Orders.jsx or AdminDashboard) to refresh analytics
-      // if (onStatusChange) onStatusChange(order._id, newStatus);
-      // change..........
-      if (onStatusChange) onStatusChange(order._id, newStatus);
-
-// 👇 ye line add karo yahi par
-onOrderStatusChange?.();  // refresh analytics instantly
-
+      console.log("✅ Order served successfully:", res.data);
+      if (onStatusChange) onStatusChange(order._id, "Served");
     } catch (err) {
-      console.error("Error updating order status:", err);
+      console.error("❌ Error updating order status:", err);
     }
   };
 
-  // --- Card color logic ---
+  // ✅ Dynamic class styling
   const getCardClass = () => {
     if (isTakeaway) return "takeaway-card";
-    if (status?.toLowerCase() === "served") return "done-card";
+    if (status === "Served") return "done-card";
     return "processing-card";
   };
 
   return (
     <div className={`order-card ${getCardClass()}`}>
-      {/* === HEADER === */}
       <div className="order-header">
         <div className="left">
           <FaUtensils className="icon" />
@@ -87,15 +83,14 @@ onOrderStatusChange?.();  // refresh analytics instantly
           </p>
           <p className="type-sub">
             {isTakeaway
-              ? "Completed"
+              ? "Not Picked Up"
               : status === "Served"
               ? "Served"
-              : "Processing"}
+              : "Ongoing"}
           </p>
         </div>
       </div>
 
-      {/* === ITEMS === */}
       <p className="item-count">
         {order?.items?.length || 0} Item{order?.items?.length > 1 ? "s" : ""}
       </p>
@@ -106,7 +101,7 @@ onOrderStatusChange?.();  // refresh analytics instantly
             <ul>
               {order.items.map((it, i) => (
                 <li key={i}>
-                  {it.quantity} × {it.name || it}
+                  {it.quantity} x {it.name || it}
                 </li>
               ))}
             </ul>
@@ -116,8 +111,12 @@ onOrderStatusChange?.();  // refresh analytics instantly
         </div>
       </div>
 
-      {/* === FOOTER === */}
-      {isTakeaway || status === "Served" ? (
+      {isTakeaway ? (
+        <div className="order-footer footer-gray">
+          <span>Order Done</span>
+          <FaCheckCircle className="done-icon" />
+        </div>
+      ) : status === "Served" ? (
         <div className="order-footer footer-done">
           <span>Order Done</span>
           <FaCheckCircle className="done-icon" />
