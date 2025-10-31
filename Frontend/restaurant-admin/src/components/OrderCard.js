@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaUtensils, FaClock, FaCheckCircle } from "react-icons/fa";
 import "./OrderCard.css";
+import API from "../api/axios";
 
 export default function OrderCard({ order, onUpdate }) {
   // Use localStorage to persist status across refreshes
@@ -20,18 +21,24 @@ export default function OrderCard({ order, onUpdate }) {
   }, [order?.status, order?._id]);
 
   const isTakeaway = order?.type === "Takeaway" || order?.orderType === "Takeaway";
+const handleProcessingClick = async () => {
+  if (isTakeaway || status === "Served") return;
 
-  const handleProcessingClick = () => {
-    if (isTakeaway || status === "Served") return;
+  // Update immediately in UI
+  setStatus("Served");
+  localStorage.setItem(`order_${order._id}_status`, "Served");
 
-    // Update immediately in UI
-    setStatus("Served");
-    // Store in localStorage to persist across refreshes
-    localStorage.setItem(`order_${order._id}_status`, "Served");
+  try {
+    //  Update in backend
+    const res = await API.patch(`/api/orders/${order._id}`, { status: "Served" });
+    console.log("Order served successfully:", res.data);
 
-    // Call onUpdate to handle the update in parent
-    if (onUpdate) onUpdate(order?._id, "Served");
-  };
+    // Call parent callback to refresh analytics
+    if (onUpdate) onUpdate(order._id, "Served");
+  } catch (err) {
+    console.error("Error updating order status:", err);
+  }
+};
 
   const getCardClass = () => {
     if (isTakeaway) return "takeaway-card";
