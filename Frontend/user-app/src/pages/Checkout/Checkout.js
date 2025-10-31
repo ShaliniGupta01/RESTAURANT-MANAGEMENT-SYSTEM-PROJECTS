@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import CartSummary from "../../components/CartSummary/Cart";
@@ -8,13 +9,9 @@ import "./Checkout.css";
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState(
-    JSON.parse(localStorage.getItem("rms_cart")) || []
-  );
+  const [cart, setCart] = useState(JSON.parse(localStorage.getItem("rms_cart")) || []);
   // eslint-disable-next-line no-unused-vars
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("rms_user")) || {}
-  );
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("rms_user")) || {});
   const [orderType, setOrderType] = useState("Dine In");
   const [cookVisible, setCookVisible] = useState(false);
   const [instructions, setInstructions] = useState("");
@@ -50,8 +47,7 @@ export default function Checkout() {
   const updateQty = (id, delta) => {
     setCart((prev) => {
       const item = prev.find((x) => x.id === id);
-      if (!item && delta > 0)
-        return [...prev, { id, name: "Item", price: 0, qty: delta }];
+      if (!item && delta > 0) return [...prev, { id, name: "Item", price: 0, qty: delta }];
 
       const updated = prev
         .map((x) =>
@@ -69,12 +65,7 @@ export default function Checkout() {
     const itemsTotal = cart.reduce((sum, c) => sum + c.qty * c.price, 0);
     const delivery = orderType === "Take Away" ? 50 : 0;
     const taxes = Math.round(itemsTotal * 0.05);
-    return {
-      itemsTotal,
-      delivery,
-      taxes,
-      grandTotal: itemsTotal + delivery + taxes,
-    };
+    return { itemsTotal, delivery, taxes, grandTotal: itemsTotal + delivery + taxes };
   };
 
   //  Find available table
@@ -109,9 +100,7 @@ export default function Checkout() {
       try {
         await api.patch(`/api/tables/${table.tableNumber}`, { reserved: true });
       } catch {
-        console.warn(
-          " Table reservation failed on server, proceeding locally."
-        );
+        console.warn(" Table reservation failed on server, proceeding locally.");
       }
     }
 
@@ -129,8 +118,7 @@ export default function Checkout() {
       totalAmount: totals.grandTotal,
       clientName: user?.name || "Guest",
       phoneNumber: user?.phone || "N/A",
-      address:
-        orderType === "Take Away" ? user?.address || "N/A" : "Restaurant",
+      address: orderType === "Take Away" ? user?.address || "N/A" : "Restaurant",
       instructions,
       totals,
       user,
@@ -197,10 +185,7 @@ export default function Checkout() {
       </div>
 
       <div style={{ marginTop: 10 }}>
-        <button
-          className="add-instruction"
-          onClick={() => setCookVisible(true)}
-        >
+        <button className="add-instruction" onClick={() => setCookVisible(true)}>
           Add cooking instructions (optional)
         </button>
       </div>
@@ -226,18 +211,12 @@ export default function Checkout() {
         </button>
       </div>
 
-      {cart.length > 0 ? (
-        <CartSummary
-          cart={cart}
-          user={user}
-          orderType={orderType}
-          onPlaceOrder={handlePlaceOrder}
-        />
-      ) : (
-        <div className="empty-cart-msg">
-          <p>Your cart is empty. Browse the menu to add items.</p>
-        </div>
-      )}
+      <CartSummary
+        cart={cart}
+        user={user}
+        orderType={orderType}
+        onPlaceOrder={handlePlaceOrder}
+      />
 
       <CookingInstruction
         visible={cookVisible}
@@ -247,3 +226,5 @@ export default function Checkout() {
     </div>
   );
 }
+
+

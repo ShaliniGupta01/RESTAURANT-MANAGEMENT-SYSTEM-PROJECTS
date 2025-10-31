@@ -1,9 +1,10 @@
 import React from "react";
 import "./FoodCard.css";
 
-export default function FoodCard({ item, qty = 0, onChangeQty }) {
+export default function FoodCard({ item, qty, onChangeQty }) {
   const BASE_URL = "https://restaurant-backend-1rky.onrender.com";
 
+  //  Build full image path safely
   const imageSrc = item?.image
     ? item.image.startsWith("http")
       ? item.image
@@ -12,6 +13,7 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
 
   return (
     <div className="food-card">
+      {/*  Food Image */}
       <div className="food-image">
         <img
           src={imageSrc}
@@ -20,12 +22,12 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
         />
       </div>
 
+      {/*  Food Details */}
       <div className="food-body">
         <div className="food-title">{item.name}</div>
 
         <div className="food-sub">
-          {/* ✅ Show price only when qty > 0 */}
-          {qty > 0 && <div className="food-price">₹{item.price}</div>}
+          <div className="food-price">₹{item.price}</div>
 
           <div className="food-actions">
             {qty > 0 ? (
@@ -49,3 +51,4 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
     </div>
   );
 }
+

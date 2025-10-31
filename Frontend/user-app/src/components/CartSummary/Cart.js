@@ -1,3 +1,5 @@
+
+
 import React, { useState, useRef } from "react";
 import { useSwipeable } from "react-swipeable";
 import "./Cart.css";
@@ -5,6 +7,7 @@ import "./Cart.css";
 export default function Cart({ cart, user, orderType, onPlaceOrder }) {
   const [swiped, setSwiped] = useState(false);
   const sliderRef = useRef(null);
+  
 
   const handleOrder = () => {
     if (!swiped) {
@@ -26,8 +29,10 @@ export default function Cart({ cart, user, orderType, onPlaceOrder }) {
   const grandTotal = itemsTotal + delivery + taxes;
 
   return (
+     
     <div className="summary-card">
-      {/* ---------- PRICE SECTION ---------- */}
+      {/* ------ PRICE SECTION ------ */}
+     
       <div className="price-section">
         <div className="row">
           <span>Item Total</span>
@@ -52,7 +57,7 @@ export default function Cart({ cart, user, orderType, onPlaceOrder }) {
         </div>
       </div>
 
-      {/* ---------- YOUR DETAILS SECTION ---------- */}
+      {/* ------ YOUR DETAILS SECTION ------ */}
       <div className="your-details">
         <div className="yd-title">Your details</div>
         <div className="yd-info">
@@ -119,7 +124,7 @@ export default function Cart({ cart, user, orderType, onPlaceOrder }) {
         )}
       </div>
 
-      {/* ---------- SWIPE TO ORDER ---------- */}
+      {/* ------ SWIPE TO ORDER ------ */}
       <div
         className="swipe-track"
         {...handlers}
