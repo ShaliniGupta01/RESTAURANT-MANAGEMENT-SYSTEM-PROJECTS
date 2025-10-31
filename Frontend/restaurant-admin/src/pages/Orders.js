@@ -8,7 +8,7 @@ export default function Orders({ onOrderUpdate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 🔹 Fetch all orders (including Served)
+  //  Fetch all orders (including Served)
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -20,38 +20,38 @@ export default function Orders({ onOrderUpdate }) {
       } else if (res.data?.orders) {
         setOrders(res.data.orders);
       } else {
-        console.warn("⚠️ Unexpected response format:", res.data);
+        console.warn(" Unexpected response format:", res.data);
         setOrders([]);
       }
     } catch (err) {
-      console.error("❌ Failed to fetch orders:", err);
+      console.error(" Failed to fetch orders:", err);
       setError("Unable to fetch orders.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 Update only the "status" field of an order
+  //  Update only the "status" field of an order
   const handleStatusChange = async (id, newStatus) => {
     try {
       console.log("Updating order:", id, "→", newStatus);
       const res = await API.patch(`/api/orders/${id}`, { status: newStatus });
 
       if (res.status === 200 && res.data?.order) {
-        // ✅ Update local state without refetching all orders
+        //  Update local state without refetching all orders
         setOrders((prev) =>
           prev.map((o) =>
             o._id === id || o.orderId === id ? res.data.order : o
           )
         );
 
-        // ✅ Notify parent (AdminDashboard) to refresh analytics
+        //  Notify parent (AdminDashboard) to refresh analytics
         if (onOrderUpdate) onOrderUpdate();
       } else {
-        console.warn("⚠️ Unexpected response:", res.data);
+        console.warn(" Unexpected response:", res.data);
       }
     } catch (err) {
-      console.error("❌ Error updating order:", err.response?.data || err.message);
+      console.error(" Error updating order:", err.response?.data || err.message);
       setError("Failed to update order status.");
     }
   };
@@ -63,7 +63,7 @@ export default function Orders({ onOrderUpdate }) {
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p className="error-text">{error}</p>;
 
-  // 🔹 Display all orders (Dine-in + Takeaway + Served)
+  //  Display all orders (Dine-in + Takeaway + Served)
   return (
     <div className="orders-page">
       <h2 className="orders-title">Order Line</h2>

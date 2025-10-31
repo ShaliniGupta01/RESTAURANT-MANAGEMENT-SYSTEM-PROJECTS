@@ -4,7 +4,7 @@ import "./OrderCard.css";
 import API from "../api/axios";
 
 export default function OrderCard({ order, onStatusChange }) {
-  // ✅ Safely get stored status from localStorage
+  // Safely get stored status from localStorage
   const getStoredStatus = () => {
     const stored = localStorage.getItem(`order_${order?._id}_status`);
     return stored || order?.status || "Ongoing";
@@ -14,7 +14,7 @@ export default function OrderCard({ order, onStatusChange }) {
   const isTakeaway =
     order?.type === "Takeaway" || order?.orderType === "Takeaway";
 
-  // ✅ Sync status if not already served
+  // Sync status if not already served
   useEffect(() => {
     const storedStatus = localStorage.getItem(`order_${order?._id}_status`);
     if (!storedStatus || storedStatus !== "Served") {
@@ -22,7 +22,7 @@ export default function OrderCard({ order, onStatusChange }) {
     }
   }, [order?.status, order?._id]);
 
-  // ✅ Handle marking order as "Served"
+  // Handle marking order as "Served"
   const handleProcessingClick = async () => {
     if (isTakeaway || status === "Served") return;
 
@@ -33,14 +33,14 @@ export default function OrderCard({ order, onStatusChange }) {
       const res = await API.patch(`/api/orders/${order._id}`, {
         status: "Served",
       });
-      console.log("✅ Order served successfully:", res.data);
+      console.log(" Order served successfully:", res.data);
       if (onStatusChange) onStatusChange(order._id, "Served");
     } catch (err) {
-      console.error("❌ Error updating order status:", err);
+      console.error(" Error updating order status:", err);
     }
   };
 
-  // ✅ Dynamic class styling
+  // Dynamic class styling
   const getCardClass = () => {
     if (isTakeaway) return "takeaway-card";
     if (status === "Served") return "done-card";

@@ -14,7 +14,7 @@ import TablesOverview from "./TablesOverview";
 import ChefPerformance from "./ChefPerformance";
 import { useSearch } from "../../context/SearchContext";
 
-// ✅ forwardRef allows parent (AdminDashboard) to call refresh()
+// forwardRef allows parent (AdminDashboard) to call refresh()
 const Analytics = forwardRef((props, ref) => {
   const { searchTerm } = useSearch();
 
@@ -36,7 +36,7 @@ const Analytics = forwardRef((props, ref) => {
   const [filter, setFilter] = useState("Daily");
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Generate random chef performance (mock data)
+  //  Generate random chef performance (mock data)
   const generateChefPerformance = useCallback((totalOrders = 20) => {
     const chefs = ["Mohan", "Pritam", "Yash", "Rahul"];
 
@@ -61,7 +61,7 @@ const Analytics = forwardRef((props, ref) => {
     return performance;
   }, []);
 
-  // 🔹 Fetch analytics from backend
+  //  Fetch analytics from backend
   const fetchAnalyticsData = useCallback(
     async (selectedFilter = filter) => {
       try {
@@ -76,7 +76,7 @@ const Analytics = forwardRef((props, ref) => {
         setRevenueData(data.revenue || []);
         setChefPerformance(generateChefPerformance(25));
       } catch (error) {
-        console.error("❌ Error fetching analytics data:", error);
+        console.error(" Error fetching analytics data:", error);
       } finally {
         setLoading(false);
       }
@@ -84,19 +84,19 @@ const Analytics = forwardRef((props, ref) => {
     [generateChefPerformance, filter]
   );
 
-  // 🔹 Allow parent (AdminDashboard) to trigger a refresh instantly
+  //  Allow parent (AdminDashboard) to trigger a refresh instantly
   useImperativeHandle(ref, () => ({
     refresh() {
       fetchAnalyticsData(filter);
     },
   }));
 
-  // 🔹 Fetch on load or filter change
+  //  Fetch on load or filter change
   useEffect(() => {
     fetchAnalyticsData(filter);
   }, [filter, fetchAnalyticsData]);
 
-  // 🔹 Blur logic (for SearchContext)
+  //  Blur logic (for SearchContext)
   const getBlurClass = (section) => {
     if (!searchTerm) return ""; // show all if empty
 

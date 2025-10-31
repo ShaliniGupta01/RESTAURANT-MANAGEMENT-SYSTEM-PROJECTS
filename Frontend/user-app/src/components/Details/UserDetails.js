@@ -105,6 +105,7 @@ export default function UserDetails({ visible, onSave }) {
         </div>
 
         <div className="dm-actions">
+          {/* ✅ No ₹ total here — just the button */}
           <button onClick={handleSave} className="btn-save" disabled={saving}>
             {saving ? "Saving..." : "Order Now"}
           </button>
