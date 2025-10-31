@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useRef,
   forwardRef,
   useImperativeHandle,
 } from "react";
@@ -91,10 +92,25 @@ const Analytics = forwardRef((props, ref) => {
     },
   }));
 
-  //  Fetch when page loads or filter changes
-  useEffect(() => {
+  const analyticsRef = useRef();
+
+// Function to reload analytics when order status changes
+const handleOrderStatusChange = () => {
+  analyticsRef.current?.refresh(); // instantly refresh analytics
+};
+
+
+useEffect(() => {
+  fetchAnalyticsData(filter);
+
+  // Auto-refresh every 10s
+  const interval = setInterval(() => {
     fetchAnalyticsData(filter);
-  }, [filter, fetchAnalyticsData]);
+  }, 10000);
+
+  return () => clearInterval(interval);
+}, [filter, fetchAnalyticsData]);
+
 
 //  Blur logic (Search)
 const getBlurClass = (section) => {
@@ -137,11 +153,13 @@ const getBlurClass = (section) => {
       <div className="analytics-grid">
         <div className={getBlurClass("orderSummary")}>
           <OrderSummary
+             ref={analyticsRef}
             served={orders?.served || 0}
             dineIn={orders?.dineIn || 0}
             takeAway={orders?.takeAway || 0}
             filter={filter}
             setFilter={setFilter}
+             onOrderStatusChange={handleOrderStatusChange}
           />
         </div>
 

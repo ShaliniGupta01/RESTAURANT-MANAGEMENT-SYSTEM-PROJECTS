@@ -3,51 +3,56 @@ import { FaUtensils, FaClock, FaCheckCircle } from "react-icons/fa";
 import "./OrderCard.css";
 import API from "../api/axios";
 
-export default function OrderCard({ order, onUpdate }) {
-  // Use localStorage to persist status across refreshes
-  const getStoredStatus = () => {
-    const stored = localStorage.getItem(`order_${order?._id}_status`);
-    return stored || order?.status || "Ongoing";
+export default function OrderCard({ order, onStatusChange, onOrderStatusChange }) {
+  // Detect Takeaway or Dine In
+  const isTakeaway =
+    order?.type?.toLowerCase().includes("take") ||
+    order?.orderType?.toLowerCase().includes("take");
+
+  // --- Initial Status ---
+  const [status, setStatus] = useState(order?.status || "Processing");
+
+  // --- Sync UI with backend whenever order updates ---
+  useEffect(() => {
+    setStatus(order?.status || "Processing");
+  }, [order?.status]);
+
+  // --- Handle Serve Click (for Dine-In orders only) ---
+  const handleProcessingClick = async () => {
+    if (isTakeaway || status === "Served") return; // Takeaway auto-served already
+
+    try {
+      const newStatus = "Served";
+      setStatus(newStatus);
+
+      const res = await API.patch(`/api/orders/${order._id}`, {
+        status: newStatus,
+      });
+      console.log("Order served successfully:", res.data);
+
+      // Tell parent (Orders.jsx or AdminDashboard) to refresh analytics
+      // if (onStatusChange) onStatusChange(order._id, newStatus);
+      // change..........
+      if (onStatusChange) onStatusChange(order._id, newStatus);
+
+// 👇 ye line add karo yahi par
+onOrderStatusChange?.();  // refresh analytics instantly
+
+    } catch (err) {
+      console.error("Error updating order status:", err);
+    }
   };
 
-  const [status, setStatus] = useState(getStoredStatus());
-
-  useEffect(() => {
-    // Only update from prop if not already "Served" in localStorage
-    const storedStatus = localStorage.getItem(`order_${order?._id}_status`);
-    if (!storedStatus || storedStatus !== "Served") {
-      setStatus(order?.status || "Ongoing");
-    }
-  }, [order?.status, order?._id]);
-
-  const isTakeaway = order?.type === "Takeaway" || order?.orderType === "Takeaway";
-const handleProcessingClick = async () => {
-  if (isTakeaway || status === "Served") return;
-
-  // Update immediately in UI
-  setStatus("Served");
-  localStorage.setItem(`order_${order._id}_status`, "Served");
-
-  try {
-    //  Update in backend
-    const res = await API.patch(`/api/orders/${order._id}`, { status: "Served" });
-    console.log("Order served successfully:", res.data);
-
-    // Call parent callback to refresh analytics
-    if (onUpdate) onUpdate(order._id, "Served");
-  } catch (err) {
-    console.error("Error updating order status:", err);
-  }
-};
-
+  // --- Card color logic ---
   const getCardClass = () => {
     if (isTakeaway) return "takeaway-card";
-    if (status === "Served") return "done-card";
+    if (status?.toLowerCase() === "served") return "done-card";
     return "processing-card";
   };
 
   return (
     <div className={`order-card ${getCardClass()}`}>
+      {/* === HEADER === */}
       <div className="order-header">
         <div className="left">
           <FaUtensils className="icon" />
@@ -82,25 +87,26 @@ const handleProcessingClick = async () => {
           </p>
           <p className="type-sub">
             {isTakeaway
-              ? "Not Picked Up"
+              ? "Completed"
               : status === "Served"
               ? "Served"
-              : "Ongoing"}
+              : "Processing"}
           </p>
         </div>
       </div>
 
+      {/* === ITEMS === */}
       <p className="item-count">
         {order?.items?.length || 0} Item{order?.items?.length > 1 ? "s" : ""}
       </p>
 
       <div className="order-body">
         <div className="order-item">
-          {order?.items && order.items.length > 0 ? (
+          {order?.items?.length > 0 ? (
             <ul>
               {order.items.map((it, i) => (
                 <li key={i}>
-                  {it.quantity} x {it.name || it}
+                  {it.quantity} × {it.name || it}
                 </li>
               ))}
             </ul>
@@ -110,12 +116,8 @@ const handleProcessingClick = async () => {
         </div>
       </div>
 
-      {isTakeaway ? (
-        <div className="order-footer footer-gray">
-          <span>Order Done</span>
-          <FaCheckCircle className="done-icon" />
-        </div>
-      ) : status === "Served" ? (
+      {/* === FOOTER === */}
+      {isTakeaway || status === "Served" ? (
         <div className="order-footer footer-done">
           <span>Order Done</span>
           <FaCheckCircle className="done-icon" />
@@ -132,4 +134,3 @@ const handleProcessingClick = async () => {
     </div>
   );
 }
-
