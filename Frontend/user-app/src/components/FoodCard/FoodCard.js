@@ -26,13 +26,12 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
       </div>
 
       {/*  Food Details */}
-      <div className="food-body">
-        <div className="food-title">{item?.name || "Unknown Item"}</div>
-
+            <div className="food-body">
+        <div className="food-title">{item.name}</div>
         <div className="food-sub">
-          <div className="food-price">₹{item?.price ?? 0}</div>
-
+          <div className="food-price">₹{item.price}</div>
           <div className="food-actions">
+
             {qty > 0 ? (
               <>
                 <button
@@ -63,3 +62,5 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
     </div>
   );
 }
+
+

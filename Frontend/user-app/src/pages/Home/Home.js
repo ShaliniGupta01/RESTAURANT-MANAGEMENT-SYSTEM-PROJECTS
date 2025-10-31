@@ -7,11 +7,14 @@ import "./Home.css";
 import UserDetails from "../../components/Details/UserDetails";
 import Categorymenu from "../../components/Category/Categorymenu";
 
+// Static constants
 const CATEGORIES = ["Burger", "Pizza", "Drink", "French fries", "Veggies"];
 const BASE_URL = "https://restaurant-backend-1rky.onrender.com";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  // --- State management ---
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("rms_user")) || null
   );
@@ -28,7 +31,7 @@ export default function Home() {
   const perPage = 8;
   const listRef = useRef();
 
-  //  Match category name loosely
+  // --- Match category names loosely ---
   const matchCategory = (catFromDB, selectedCat) => {
     if (!catFromDB || !selectedCat) return false;
     const c1 = catFromDB.toLowerCase().replace(/\s+/g, "");
@@ -42,7 +45,7 @@ export default function Home() {
     );
   };
 
-  //  Fetch menu items from backend only
+  // --- Fetch menu items from backend ---
   useEffect(() => {
     const fetchMenu = async () => {
       try {
@@ -55,7 +58,7 @@ export default function Home() {
             image: item.image
               ? item.image.startsWith("http")
                 ? item.image
-                : `${BASE_URL}${item.image}`
+                : `${BASE_URL}${item.image.startsWith("/") ? item.image : "/" + item.image}`
               : "/default-food.png",
           }));
 
@@ -80,7 +83,7 @@ export default function Home() {
     fetchMenu();
   }, [selected]);
 
-  //  Auto-switch category if search matches one
+  // --- Auto-switch category when search matches ---
   useEffect(() => {
     if (!search) return;
     const foundCategory = CATEGORIES.find(
@@ -94,7 +97,7 @@ export default function Home() {
     }
   }, [search]);
 
-  //  Search + Category filter logic
+  // --- Filter by category + search ---
   useEffect(() => {
     const filtered = items.filter(
       (i) =>
@@ -104,12 +107,12 @@ export default function Home() {
     setVisibleItems(filtered.slice(0, perPage));
   }, [selected, items, search]);
 
-  //  Persist cart in localStorage
+  // --- Save cart to localStorage ---
   useEffect(() => {
     localStorage.setItem("rms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  //  Add or remove item
+  // --- Add or remove items from cart ---
   const onAdd = (item, delta) => {
     setCart((prev) => {
       const exists = prev.find(
@@ -143,7 +146,7 @@ export default function Home() {
   const qtyOf = (id, name) =>
     cart.find((c) => c._id === id && c.name === name)?.qty || 0;
 
-  // Infinite scroll
+  // --- Infinite scroll (Load more items) ---
   const loadMore = () => {
     const filtered = items.filter(
       (i) =>
@@ -162,14 +165,17 @@ export default function Home() {
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 120) loadMore();
   };
 
+  // --- Handle user detail modal ---
   const handleDetailsSave = (u) => {
     setUser(u);
     setShowDetails(false);
   };
 
+  // --- Render ---
   return (
     <>
       <div className={`home-shell ${showDetails ? "modal-active" : ""}`}>
+        {/* Header */}
         <header className="home-header">
           <div className="greet">
             <div className="greet-large">
@@ -185,15 +191,17 @@ export default function Home() {
           </div>
         </header>
 
-        {/*  Search + total */}
+        {/* Search bar + Cart total */}
         <div className="search-row">
           <SearchBar value={search} onChange={setSearch} />
-          <div className="cart-total">
-            ₹{cart.reduce((s, c) => s + c.qty * c.price, 0)}
-          </div>
+          {cart.length > 0 && (
+            <div className="cart-total">
+              ₹{cart.reduce((s, c) => s + c.qty * c.price, 0)}
+            </div>
+          )}
         </div>
 
-        {/*  Category menu */}
+        {/* Category menu */}
         {(!search ||
           !CATEGORIES.some((cat) =>
             cat.toLowerCase().includes(search.toLowerCase())
@@ -207,7 +215,7 @@ export default function Home() {
 
         <div className="category-title">{selected}</div>
 
-        {/*  Food list */}
+        {/* Items grid */}
         <div className="items-grid" onScroll={onScroll} ref={listRef}>
           {visibleItems.length > 0 ? (
             visibleItems.map((it) => (
@@ -223,7 +231,7 @@ export default function Home() {
           )}
         </div>
 
-        {/*  Checkout */}
+        {/* Checkout button */}
         <div className="next-fixed">
           <button className="btn-next" onClick={() => navigate("/checkout")}>
             Next
@@ -231,7 +239,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/*  User details modal */}
+      {/* User details modal */}
       {showDetails && (
         <UserDetails visible={showDetails} onSave={handleDetailsSave} />
       )}

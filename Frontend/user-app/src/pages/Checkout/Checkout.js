@@ -1,16 +1,15 @@
-
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import CartSummary from "../../components/CartSummary/Cart";
 import CookingInstruction from "../../components/CookingInstruction/CookingInstruction";
-import SearchBar from "../../components/SearchBar/SearchBar";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../../components/SearchBar/SearchBar";
 import "./Checkout.css";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem("rms_cart")) || []);
-  // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("rms_user")) || {});
   const [orderType, setOrderType] = useState("Dine In");
   const [cookVisible, setCookVisible] = useState(false);
@@ -18,7 +17,7 @@ export default function Checkout() {
   const [tables, setTables] = useState([]);
   const [search, setSearch] = useState("");
 
-  // Fetch tables from backend
+  //  Fetch tables
   useEffect(() => {
     api
       .get("/api/tables")
@@ -26,8 +25,8 @@ export default function Checkout() {
         const t = Array.isArray(res.data) ? res.data : res.data.tables || [];
         setTables(t);
       })
-      .catch((err) => {
-        console.warn(" Could not fetch tables, using mock data.", err.message);
+      .catch(() => {
+        // fallback mock tables
         setTables(
           Array.from({ length: 30 }, (_, i) => ({
             tableNumber: i + 1,
@@ -38,20 +37,19 @@ export default function Checkout() {
       });
   }, []);
 
-  // Persist cart to localStorage
+  //  Persist cart
   useEffect(() => {
     localStorage.setItem("rms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  //  Update quantity
-  const updateQty = (id, delta) => {
+  //  Update quantity (individual item)
+  const updateQty = (_id, name, delta) => {
     setCart((prev) => {
-      const item = prev.find((x) => x.id === id);
-      if (!item && delta > 0) return [...prev, { id, name: "Item", price: 0, qty: delta }];
-
       const updated = prev
         .map((x) =>
-          x.id === id ? { ...x, qty: Math.max(0, x.qty + delta) } : x
+          x._id === _id && x.name === name
+            ? { ...x, qty: Math.max(0, x.qty + delta) }
+            : x
         )
         .filter((x) => x.qty > 0);
 
@@ -60,12 +58,17 @@ export default function Checkout() {
     });
   };
 
-  //  Totals
+  //  Calculate totals
   const computeTotals = () => {
-    const itemsTotal = cart.reduce((sum, c) => sum + c.qty * c.price, 0);
+    const itemsTotal = cart.reduce((s, c) => s + c.qty * c.price, 0);
     const delivery = orderType === "Take Away" ? 50 : 0;
     const taxes = Math.round(itemsTotal * 0.05);
-    return { itemsTotal, delivery, taxes, grandTotal: itemsTotal + delivery + taxes };
+    return {
+      itemsTotal,
+      delivery,
+      taxes,
+      grandTotal: itemsTotal + delivery + taxes,
+    };
   };
 
   //  Find available table
@@ -80,16 +83,20 @@ export default function Checkout() {
     return null;
   };
 
-  //  Place order
+  // Place order
   const handlePlaceOrder = async () => {
-    if (cart.length === 0) return alert(" Your cart is empty!");
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
 
     let tableNumber = null;
-
     if (orderType === "Dine In") {
       const table = findTable();
-      if (!table) return alert(" All tables are full. Please wait.");
-
+      if (!table) {
+        alert("All tables are full. Please wait.");
+        return;
+      }
       tableNumber = table.tableNumber;
       setTables((prev) =>
         prev.map((t) =>
@@ -100,7 +107,7 @@ export default function Checkout() {
       try {
         await api.patch(`/api/tables/${table.tableNumber}`, { reserved: true });
       } catch {
-        console.warn(" Table reservation failed on server, proceeding locally.");
+        console.warn("Table reservation failed, proceeding locally.");
       }
     }
 
@@ -127,17 +134,18 @@ export default function Checkout() {
     try {
       const res = await api.post("/api/orders", orderData);
       if (res.status === 201 || res.status === 200) {
-        alert(" Order placed successfully!");
+        alert("Order placed successfully!");
         localStorage.removeItem("rms_cart");
         setCart([]);
         navigate("/thankyou");
       }
     } catch (err) {
-      console.error(" Order creation failed:", err);
-      alert(" Could not place order. Try again.");
+      console.error("Order creation failed:", err);
+      alert("Could not place order. Try again.");
     }
   };
 
+  //  Greeting
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "morning";
@@ -147,6 +155,7 @@ export default function Checkout() {
 
   return (
     <div className="checkout-shell">
+      {/* Header greeting */}
       <header className="home-header">
         <div className="greet">
           <div className="greet-large">Good {greeting}</div>
@@ -154,11 +163,13 @@ export default function Checkout() {
         </div>
       </header>
 
+      {/* Search bar */}
       <SearchBar value={search} onChange={setSearch} />
 
+      {/* Cart items */}
       <div className="cart-items">
         {cart.map((it) => (
-          <div className="cart-item" key={it.id}>
+          <div className="cart-item" key={it._id}>
             <div className="cart-img">
               <img
                 src={
@@ -176,14 +187,15 @@ export default function Checkout() {
               <div className="ci-price">₹{it.price}</div>
             </div>
             <div className="ci-controls">
-              <button onClick={() => updateQty(it.id, -1)}>-</button>
+              <button onClick={() => updateQty(it._id, it.name, -1)}>-</button>
               <span>{it.qty}</span>
-              <button onClick={() => updateQty(it.id, +1)}>+</button>
+              <button onClick={() => updateQty(it._id, it.name, +1)}>+</button>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Add cooking instructions */}
       <div style={{ marginTop: 10 }}>
         <button className="add-instruction" onClick={() => setCookVisible(true)}>
           Add cooking instructions (optional)
@@ -196,6 +208,7 @@ export default function Checkout() {
         </div>
       )}
 
+      {/* Dine In / Take Away toggle */}
       <div className={`order-type ${orderType === "Take Away" ? "swap" : ""}`}>
         <button
           className={orderType === "Dine In" ? "active" : ""}
@@ -211,6 +224,7 @@ export default function Checkout() {
         </button>
       </div>
 
+      {/* Swipe-to-order summary */}
       <CartSummary
         cart={cart}
         user={user}
@@ -218,6 +232,7 @@ export default function Checkout() {
         onPlaceOrder={handlePlaceOrder}
       />
 
+      {/* Cooking instruction modal */}
       <CookingInstruction
         visible={cookVisible}
         onClose={() => setCookVisible(false)}
@@ -226,5 +241,3 @@ export default function Checkout() {
     </div>
   );
 }
-
-
