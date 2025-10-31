@@ -1,7 +1,7 @@
 import React from "react";
 import { FaUsers, FaChartLine, FaUtensils, FaRupeeSign } from "react-icons/fa";
 import "./StatsRow.css";
-import { useSearch } from "../../context/SearchContext"; // 🔹 import your Search Context
+import { useSearch } from "../../context/SearchContext"; 
 
 // Custom StatCard component
 const StatCard = ({ title, value, icon: Icon, iconColor, bgColor, isBlurred }) => (
@@ -50,7 +50,7 @@ export default function StatsRow({ stats = {} }) {
         title="TOTAL CHEF"
         value={String(4).padStart(2, "0")}
         icon={FaUtensils}
-        iconColor="#60a5fa"
+        iconColor="#131314ff"
         bgColor="#eff6ff"
         isBlurred={shouldBlur("TOTAL CHEF")}
       />
@@ -58,24 +58,24 @@ export default function StatsRow({ stats = {} }) {
         title="TOTAL REVENUE"
         value={`₹${(totalRevenue / 1000).toFixed(1)}K`}
         icon={FaRupeeSign}
-        iconColor="#34d399"
-        bgColor="#d1fae5"
+        iconColor="#131314ff"
+        bgColor="#eff6ff"
         isBlurred={shouldBlur("TOTAL REVENUE")}
       />
       <StatCard
         title="TOTAL ORDERS"
         value={String(totalOrders).padStart(2, "0")}
         icon={FaChartLine}
-        iconColor="#fcd34d"
-        bgColor="#fefce8"
+        iconColor="#131314ff"
+        bgColor="#eff6ff"
         isBlurred={shouldBlur("TOTAL ORDERS")}
       />
       <StatCard
         title="TOTAL CLIENTS"
         value={String(totalClients).padStart(2, "0")}
         icon={FaUsers}
-        iconColor="#fb923c"
-        bgColor="#fff7ed"
+        iconColor="#131314ff"
+        bgColor="#eff6ff"
         isBlurred={shouldBlur("TOTAL CLIENTS")}
       />
     </div>

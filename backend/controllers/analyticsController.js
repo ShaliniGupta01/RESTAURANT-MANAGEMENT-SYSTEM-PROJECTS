@@ -3,7 +3,6 @@ import Chef from "../models/chefModel.js";
 
 export const getAnalytics = async (req, res) => {
   try {
-    // --- Basic Stats ---
     const totalOrders = await Order.countDocuments();
     const totalChefs = await Chef.countDocuments();
 
@@ -16,51 +15,44 @@ export const getAnalytics = async (req, res) => {
       arr.filter(Boolean).length
     );
 
-    // --- Order breakdown by status ---
+    // --- Status Breakdown ---
     const statusAgg = await Order.aggregate([
       {
         $group: {
-          _id: { $toLower: "$status" },
+          _id: {
+            $toLower: { $trim: { input: "$status" } },
+          },
           count: { $sum: 1 },
         },
       },
     ]);
 
-    // --- Order breakdown by type ---
+    // --- Type Breakdown ---
     const typeAgg = await Order.aggregate([
       {
         $group: {
-          _id: { $toLower: "$type" },
+          _id: {
+            $toLower: { $trim: { input: "$type" } },
+          },
           count: { $sum: 1 },
         },
       },
     ]);
 
-    // --- Helper: safely get count for any status key ---
     const getCount = (key) =>
       statusAgg.find((s) => s._id === key.toLowerCase())?.count || 0;
 
-    // --- Combine both “served” and “done” as “served” ---
     const servedCount = getCount("served") + getCount("done");
 
-    // --- Construct order summary ---
     const orders = {
-      served: servedCount, // ✅ unified served data
+      served: servedCount,
       processing: getCount("processing"),
       dineIn:
-        typeAgg.find(
-          (t) => t._id === "dine-in" || t._id === "dine in" || t._id === "dinein"
-        )?.count || 0,
+        typeAgg.find((t) => t._id.includes("dine"))?.count || 0,
       takeAway:
-        typeAgg.find(
-          (t) =>
-            t._id === "takeaway" ||
-            t._id === "take away" ||
-            t._id === "take_away"
-        )?.count || 0,
+        typeAgg.find((t) => t._id.includes("take"))?.count || 0,
     };
 
-    // --- Revenue (last 30 days) ---
     const revenueSeries = await Order.aggregate([
       {
         $group: {
@@ -77,14 +69,12 @@ export const getAnalytics = async (req, res) => {
       value: r.total,
     }));
 
-    // --- Final Response ---
     res.json({
       stats: { totalOrders, totalChefs, totalRevenue, totalClients },
       orders,
       revenue,
     });
   } catch (error) {
-    console.error("Error fetching analytics:", error);
     res.status(500).json({ message: error.message });
   }
 };

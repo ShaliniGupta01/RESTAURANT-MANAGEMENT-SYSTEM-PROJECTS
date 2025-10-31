@@ -8,7 +8,7 @@ export default function Orders({ onOrderUpdate }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch orders (including served ones)
+  // 🔹 Fetch all orders (including Served)
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -31,17 +31,28 @@ export default function Orders({ onOrderUpdate }) {
     }
   };
 
+  // 🔹 Update only the "status" field of an order
   const handleStatusChange = async (id, newStatus) => {
     try {
+      console.log("Updating order:", id, "→", newStatus);
       const res = await API.patch(`/api/orders/${id}`, { status: newStatus });
+
       if (res.status === 200 && res.data?.order) {
+        // update locally
         setOrders((prev) =>
-          prev.map((o) => (o._id === id ? res.data.order : o))
+          prev.map((o) =>
+            o._id === id || o.orderId === id ? res.data.order : o
+          )
         );
-        if (onOrderUpdate) onOrderUpdate(); // Notify parent to update OrderSummary
+
+        // refresh analytics
+        if (onOrderUpdate) onOrderUpdate();
+      } else {
+        console.warn("Unexpected response:", res.data);
       }
     } catch (err) {
-      console.error("Error updating order:", err);
+      console.error("Error updating order:", err.response?.data || err.message);
+      setError("Failed to update order status.");
     }
   };
 
@@ -52,7 +63,7 @@ export default function Orders({ onOrderUpdate }) {
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p className="error-text">{error}</p>;
 
-  // Show *all* orders, including "Served"
+  // 🔹 Show all orders, including Served
   return (
     <div className="orders-page">
       <h2 className="orders-title">Order Line</h2>
@@ -62,7 +73,7 @@ export default function Orders({ onOrderUpdate }) {
         ) : (
           orders.map((order) => (
             <OrderCard
-              key={order._id || order.id}
+              key={order._id || order.orderId}
               order={order}
               onStatusChange={handleStatusChange}
             />
