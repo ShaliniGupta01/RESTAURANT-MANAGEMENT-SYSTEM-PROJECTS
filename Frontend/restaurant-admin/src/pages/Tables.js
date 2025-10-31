@@ -69,7 +69,7 @@ export default function Tables() {
             {/* Display name first, then number */}
             <div className="table-name">{t.tableName || "Table"}</div>
             <div className="table-number">
-              {String(t.tableNumber || 0).padStart(2, "0")}
+              {String(t.tableNumber).padStart(2, "0")}
             </div>
 
             <div className="table-footer">

@@ -182,6 +182,15 @@
   border-bottom-color: #aaa;
 }
 
+
+.checkout-content.blurred {
+  filter: blur(5px);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
 /*  Responsive fix for small screens */
 @media (max-width: 480px) {
   .cart-item {
