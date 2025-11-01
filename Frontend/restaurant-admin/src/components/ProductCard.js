@@ -29,28 +29,23 @@ export default function ProductCard({ item }) {
           <strong>Price:</strong> ₹{item.price}
         </p>
         <p>
-          <strong>Average Prep Time:</strong>{" "}
-          {item.prepTime ? `${item.prepTime}` : "N/A"}
+          <strong>Average Prep Time:</strong> {item.prepTime}
         </p>
         <p>
           <strong>Category:</strong> {item.category}
         </p>
 
-        {/* Stock logic */}
-        {item.stock > 0 ? (
-          <>
-            <p>
-              <strong>Stock:</strong> Yes
-            </p>
-            {item.rating && (
-              <p>
-                <strong>Rating:</strong> ⭐ {item.rating}
-              </p>
-            )}
-          </>
-        ) : (
+        {/* Show stock line only when stock > 0 */}
+        {item.stock > 0 && (
           <p>
-            <strong>Stock:</strong> No
+            <strong>Stock:</strong> Yes
+          </p>
+        )}
+
+        {/* Show rating if it exists */}
+        {item.rating && (
+          <p>
+            <strong>Rating:</strong> {item.rating} ⭐
           </p>
         )}
       </div>

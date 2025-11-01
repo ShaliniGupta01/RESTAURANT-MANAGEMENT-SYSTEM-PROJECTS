@@ -55,12 +55,12 @@
 .nav-item.logout-link {
   position: absolute;
   bottom: 15px;
-  background-color: #e4e2e2 !important; 
+  background-color: #F0F5F3 !important; 
   color: #fff !important;
 }
 
 .nav-item.logout-link:hover {
-  background-color: #dfdddd !important; 
+  background-color: #F0F5F3 !important; 
   transform: translateY(-2px);
 }
 
