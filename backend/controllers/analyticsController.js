@@ -1,5 +1,3 @@
-
-
 import Order from "../models/orderModel.js";
 import Chef from "../models/chefModel.js";
 
@@ -37,6 +35,7 @@ export const getAnalytics = async (req, res) => {
         },
       },
     ]);
+    console.log("Type Aggregation Result:", typeAgg); // TEMP: Debug - Check if "dine in" and "takeaway" counts are there
 
     // Correct Served Logic
     const servedCount = await Order.countDocuments({
@@ -53,6 +52,7 @@ export const getAnalytics = async (req, res) => {
       takeAway:
         typeAgg.find((t) => t._id.includes("take"))?.count || 0,
     };
+    console.log("Orders Summary:", orders); // TEMP: Debug - Check dineIn and takeAway counts
 
     // Revenue Series for Chart
     const revenueSeries = await Order.aggregate([
@@ -71,7 +71,7 @@ export const getAnalytics = async (req, res) => {
       value: r.total,
     }));
 
-    // Fetch real chef data (names and ordersHandled)
+    // Fetch real chef data
     const chefs = await Chef.find({}, 'name ordersHandled').sort({ ordersHandled: -1 });
 
     // Final Response
@@ -79,7 +79,7 @@ export const getAnalytics = async (req, res) => {
       stats: { totalOrders, totalChefs, totalRevenue, totalClients },
       orders,
       revenue,
-      chefs, // Array of { name, ordersHandled }
+      chefs,
     });
   } catch (error) {
     console.error("Error in getAnalytics:", error);

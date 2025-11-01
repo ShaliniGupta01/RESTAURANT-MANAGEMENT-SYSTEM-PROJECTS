@@ -5,11 +5,16 @@ import Table from "../models/tableModel.js";
 // Assign chef with least handled orders
 const assignChef = async () => {
   const chefs = await Chef.find().sort({ ordersHandled: 1 });
-  if (chefs.length === 0) return null;
+  if (chefs.length === 0) {
+    console.log("No chefs available for assignment"); // Debug
+    return null;
+  }
 
   const assignedChef = chefs[0];
+  console.log(`Assigning order to chef: ${assignedChef.name}, current ordersHandled: ${assignedChef.ordersHandled}`); // Debug
   assignedChef.ordersHandled += 1;
   await assignedChef.save();
+  console.log(`Chef ${assignedChef.name} updated, new ordersHandled: ${assignedChef.ordersHandled}`); // Debug
   return assignedChef.name;
 };
 
@@ -40,6 +45,8 @@ export const createOrder = async (req, res) => {
       user,
     } = req.body;
 
+    console.log(`Received order type: ${type}`); // Debug: Check incoming type
+
     // Handle totals from frontend
     if (!totalAmount && totals?.grandTotal) {
       totalAmount = Number(totals.grandTotal);
@@ -51,11 +58,18 @@ export const createOrder = async (req, res) => {
       price: it.price ?? it.unitPrice ?? 0,
     }));
 
+    // Assign chef for ALL orders (dine-in and takeaway)
     const assignedChef = await assignChef();
+    console.log(`Order assigned to chef: ${assignedChef} for type: ${type}`); // Debug
+
+    // Improved type check (case-insensitive)
+    const normalizedType = type?.toLowerCase().trim();
+    const orderType = (normalizedType === "dine in" || normalizedType === "dinein") ? "Dine In" : "Takeaway";
+    console.log(`Final order type set to: ${orderType}`); // Debug
 
     const newOrder = await Order.create({
       orderId: orderId || `ODR-${Date.now()}`,
-      type: type === "Dine In" || type === "DineIn" ? "Dine In" : "Takeaway",
+      type: orderType,
       tableNumber: tableNumber ?? null,
       items: mappedItems,
       totalAmount:
@@ -70,8 +84,9 @@ export const createOrder = async (req, res) => {
       processingTime: Math.floor(Math.random() * 10) + 5,
     });
 
-    // Reserve table for dine-in
-    if (newOrder.type === "Dine In" && newOrder.tableNumber) {
+    // Reserve table ONLY for dine-in
+    if (orderType === "Dine In" && newOrder.tableNumber) {
+      console.log(`Reserving table ${newOrder.tableNumber} for dine-in`); // Debug
       await Table.findOneAndUpdate(
         { tableNumber: Number(newOrder.tableNumber) },
         { reserved: true, $inc: { bookedFor: 1 } },
@@ -81,10 +96,10 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json(newOrder);
   } catch (error) {
+    console.error("Error creating order:", error);
     res.status(400).json({ message: error.message });
   }
 };
-
 
 export const updateOrderStatus = async (req, res) => {
   try {
@@ -108,4 +123,3 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
