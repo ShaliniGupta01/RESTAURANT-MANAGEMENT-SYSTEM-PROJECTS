@@ -9,6 +9,7 @@ export default function AdminMenu() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Fetch products from backend
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -27,11 +28,7 @@ export default function AdminMenu() {
 
   // Disable scroll when modal is open
   useEffect(() => {
-    if (showModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    document.body.style.overflow = showModal ? "hidden" : "auto";
   }, [showModal]);
 
   const handleProductAdded = () => {
@@ -63,7 +60,7 @@ export default function AdminMenu() {
         )}
       </div>
 
-      {/* Only Add Product Modal */}
+      {/* Add Product Modal */}
       {showModal && (
         <AddProduct
           onClose={() => setShowModal(false)}
