@@ -81,7 +81,7 @@
   font-weight: 500;
 }
 
-/* Add Table Section */
+
 .add-table-wrapper {
   position: relative;
   display: inline-block;
@@ -110,11 +110,11 @@
   color: #9ca3af;
 }
 
-/* Side Modal beside plus card */
+
 .side-modal {
   position: absolute;
   top: 0;
-  left: 110%; /* appear to right side */
+  left: 110%; 
   background: #f3f7f5;
   border-radius: 10px;
   padding: 12px 14px;
@@ -204,4 +204,5 @@
 
 .btn-create-full:hover {
   background: #333;
-}
+} 
+

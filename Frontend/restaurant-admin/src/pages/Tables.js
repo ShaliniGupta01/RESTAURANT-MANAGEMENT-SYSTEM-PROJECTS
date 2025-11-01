@@ -17,11 +17,9 @@ export default function Tables() {
   const fetchTables = async () => {
     try {
       const res = await API.get("/api/tables");
-      const data =
-        Array.isArray(res.data) ? res.data : res.data.tables || res.data || [];
+      const data = Array.isArray(res.data) ? res.data : res.data?.tables || [];
       setTables(data);
 
-      // determine next table number
       const maxNum =
         data.length > 0 ? Math.max(...data.map((t) => t.tableNumber || 0)) : 0;
       setNextTableNumber(maxNum + 1);
@@ -35,10 +33,9 @@ export default function Tables() {
   const addTable = async (payload) => {
     try {
       setLoading(true);
-      const res = await API.post("/api/tables", payload);
-      setTables((prev) => [...prev, res.data]);
+      await API.post("/api/tables", payload);
+      await fetchTables(); // ensures fresh list with correct _id
       setShowModal(false);
-      setNextTableNumber((prev) => prev + 1);
     } catch (err) {
       console.error("Error adding table:", err);
       alert("Failed to add table. Check backend connection.");
@@ -49,12 +46,14 @@ export default function Tables() {
 
   // === Delete table ===
   const deleteTable = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this table?")) return;
     try {
+      console.log("Deleting table ID:", id);
       await API.delete(`/api/tables/${id}`);
-      setTables((prev) => prev.filter((t) => t._id !== id));
+      await fetchTables(); // refresh after delete
     } catch (err) {
       console.error("Error deleting table:", err);
-      alert("Failed to delete table.");
+      alert("Failed to delete table. Check if ID exists in backend.");
     }
   };
 
@@ -64,7 +63,7 @@ export default function Tables() {
 
       <div className="tables-grid">
         {tables.map((t) => (
-          <div key={t._id} className="table-card">
+          <div key={t._id || t.tableNumber} className="table-card">
             <button
               className="delete-icon"
               onClick={() => deleteTable(t._id)}
@@ -87,7 +86,7 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add Table Card + Popup */}
+        {/* Add Table */}
         <div className="add-table-wrapper">
           <div
             className="add-table-card"

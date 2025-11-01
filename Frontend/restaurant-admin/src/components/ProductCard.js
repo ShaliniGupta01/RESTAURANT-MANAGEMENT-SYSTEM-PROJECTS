@@ -29,11 +29,15 @@ export default function ProductCard({ item }) {
           <strong>Price:</strong> ₹{item.price}
         </p>
         <p>
+          <strong>Average Prep Time:</strong>{" "}
+          {item.prepTime ? `${item.prepTime}` : "N/A"}
+        </p>
+        <p>
           <strong>Category:</strong> {item.category}
         </p>
 
-        {/* Only show stock & rating if available */}
-        {item.stock > 0 && (
+        {/* Stock logic */}
+        {item.stock > 0 ? (
           <>
             <p>
               <strong>Stock:</strong> Yes
@@ -44,6 +48,10 @@ export default function ProductCard({ item }) {
               </p>
             )}
           </>
+        ) : (
+          <p>
+            <strong>Stock:</strong> No
+          </p>
         )}
       </div>
     </div>
