@@ -22,12 +22,6 @@
   position: relative;
 }
 
-/* Push only the last nav item to bottom */
-.logout-link {
-  position: absolute;
-  bottom: 15px;  /* space from bottom */
-}
-
 /* circular nav icons */
 .nav-item {
   display: flex;
@@ -42,6 +36,7 @@
   color: #4b5563;
   transition: all 0.25s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 
 .nav-item:hover {
@@ -56,6 +51,19 @@
   transform: translateY(-2px);
 }
 
+
+.nav-item.logout-link {
+  position: absolute;
+  bottom: 15px;
+  background-color: #e4e2e2 !important; 
+  color: #fff !important;
+}
+
+.nav-item.logout-link:hover {
+  background-color: #dfdddd !important; 
+  transform: translateY(-2px);
+}
+
 .nav-icon {
   font-size: 20px;
 }
@@ -66,4 +74,3 @@
     height: 44px;
   }
 }
-
