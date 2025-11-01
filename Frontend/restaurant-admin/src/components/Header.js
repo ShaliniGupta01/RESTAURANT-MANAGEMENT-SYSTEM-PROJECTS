@@ -12,7 +12,7 @@ export default function Header() {
   //Show the search bar on Analytics and Add Product page
    const showSearch =
     location.pathname === "/analytics" ||
-    location.pathname === "/add-product" ||
+    location.pathname === "/admin-menu" ||
     location.pathname === "/" ||
     location.pathname === "/dashboard";
 

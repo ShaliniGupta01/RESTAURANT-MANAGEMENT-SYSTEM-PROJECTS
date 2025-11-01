@@ -35,12 +35,21 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/add-product"
+          to="/admin-menu"
           className={({ isActive }) =>
             isActive ? "nav-item active" : "nav-item"
           }
         >
-          <FaPlus className="nav-icon" title="Add Product" />
+          <FaPlus className="nav-icon" title="Manage Menu / Add Product" />
+        </NavLink>
+
+        {/* Last NavLink at bottom — empty, no icon */}
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? "nav-item active logout-link" : "nav-item logout-link"
+          }
+        >
         </NavLink>
       </nav>
     </aside>

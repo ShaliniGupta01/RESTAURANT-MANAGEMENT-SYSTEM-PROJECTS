@@ -1,11 +1,10 @@
 
-
 import React from "react";
 import "./ChefPerformance.css";
 
 const ChefPerformance = ({ chefPerformance }) => {
-  // Fixed list of chef names (expanded to include assigned chefs)
-  const fixedChefs = ["Harpal", "Kabir ", "Yogesh", "Satyaram", "Ram Narayan", "Mohan"];
+  // Fixed list of chef names (expanded to include assigned chefs from orders)
+  const fixedChefs = ["Harpal", "Kabir ", "Yogesh", "Mohan"];
 
   return (
     <div className="chef-performance-card">

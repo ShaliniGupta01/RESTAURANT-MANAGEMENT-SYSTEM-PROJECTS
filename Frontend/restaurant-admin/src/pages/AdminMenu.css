@@ -1,0 +1,33 @@
+.menu-container {
+  position: relative;
+}
+
+.menu-page {
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.menu-page.blur-bg {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.add-btn:hover {
+  background: #15803d;
+}

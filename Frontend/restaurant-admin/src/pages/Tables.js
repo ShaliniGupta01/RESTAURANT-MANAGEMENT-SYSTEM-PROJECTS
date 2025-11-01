@@ -12,7 +12,7 @@ export default function Tables() {
     fetchTables();
   }, []);
 
-  // === Fetch all tables ===
+  // Fetch all tables
   const fetchTables = async () => {
     try {
       const res = await API.get("/api/tables");
@@ -25,7 +25,7 @@ export default function Tables() {
     }
   };
 
-  // === Add a new table ===
+  // Add a table (POST)
   const addTable = async (payload) => {
     try {
       setLoading(true);
@@ -40,7 +40,7 @@ export default function Tables() {
     }
   };
 
-  // === Delete a table ===
+  // Delete table
   const deleteTable = async (id) => {
     try {
       await API.delete(`/api/tables/${id}`);
@@ -66,7 +66,7 @@ export default function Tables() {
               <FaTrashAlt />
             </button>
 
-            {/* Display name first, then number */}
+            {/* Updated order: Name first, number second */}
             <div className="table-name">{t.tableName || "Table"}</div>
             <div className="table-number">
               {String(t.tableNumber).padStart(2, "0")}
@@ -81,13 +81,13 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add Table Card */}
+        {/* Add Table Button */}
         <div className="add-table-card" onClick={() => setShowModal(true)}>
           <FaPlus className="plus-icon" />
         </div>
       </div>
 
-      {/* Create Table Modal */}
+      {/* Modal for Creating Table */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -104,7 +104,6 @@ export default function Tables() {
   );
 }
 
-// === Create Table Modal Component ===
 function CreateTable({ onCreate, onCancel, loading }) {
   const [name, setName] = useState("");
   const [size, setSize] = useState(2);
