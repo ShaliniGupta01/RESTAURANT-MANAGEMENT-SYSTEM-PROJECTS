@@ -2,30 +2,36 @@ import React from "react";
 import "./ProductCard.css";
 
 export default function ProductCard({ item }) {
-    return (
-        <div className="product-card">
-            <div className="product-image">
-                {item.image ? (
-                    <img
-                        src={item.image.startsWith("http") ? item.image : item.image}
-                        alt={item.name}
-                    />
-                ) : (
-                    <div className="no-image">Image</div>
-                )}
-            </div>
+  // CRA uses process.env.REACT_APP_...
+  const backendURL =
+    process.env.REACT_APP_API_BASE_URL ||
+    "https://restaurant-backend-1rky.onrender.com";
 
-            <div className="product-details">
-                <p><strong>Name:</strong> {item.name}</p>
-                <p><strong>Description:</strong> {item.description}</p>
-                <p><strong>Price:</strong> ₹{item.price}</p>
-                <p><strong>Average Prep Time:</strong> {item.averagePreparationTime || "N/A"}</p>
-                <p><strong>Category:</strong> {item.category}</p>
-                <p><strong>InStock:</strong> {item.stock > 0 ? "Yes" : "No"}</p>
-                <p className="rating">
-                    <strong>Rating:</strong> {item.rating || 0} ⭐
-                </p>
-            </div>
-        </div>
-    );
+  const imageUrl = item.image
+    ? item.image.startsWith("http")
+      ? item.image
+      : `${backendURL}${item.image}`
+    : "/placeholder.png";
+
+  return (
+    <div className="product-card">
+      <div className="product-image">
+        <img src={imageUrl} alt={item.name} />
+      </div>
+
+      <div className="product-details">
+        <h3>{item.name}</h3>
+        <p>{item.description}</p>
+        <p>
+          <strong>Price:</strong> ₹{item.price}
+        </p>
+        <p>
+          <strong>Category:</strong> {item.category}
+        </p>
+        <p>
+          <strong>Stock:</strong> {item.stock > 0 ? "Yes" : "No"}
+        </p>
+      </div>
+    </div>
+  );
 }

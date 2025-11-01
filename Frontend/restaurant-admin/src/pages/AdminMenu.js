@@ -9,12 +9,22 @@ export default function AdminMenu() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Fetch products from backend
+  // --- Fetch all products ---
   const fetchProducts = async () => {
     try {
       setLoading(true);
       const res = await API.get("/api/menu");
-      setProducts(Array.isArray(res.data) ? res.data : res.data?.menu || []);
+
+      // Backend might return: { success, data: [...] } or direct array
+      const productList = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data?.data)
+        ? res.data.data
+        : Array.isArray(res.data?.menu)
+        ? res.data.menu
+        : [];
+
+      setProducts(productList);
     } catch (err) {
       console.error("Error fetching products:", err);
     } finally {
@@ -26,7 +36,7 @@ export default function AdminMenu() {
     fetchProducts();
   }, []);
 
-  // Disable scroll when modal is open
+  // Disable body scroll when modal open
   useEffect(() => {
     document.body.style.overflow = showModal ? "hidden" : "auto";
   }, [showModal]);
@@ -38,7 +48,6 @@ export default function AdminMenu() {
 
   return (
     <div className="menu-container">
-      {/* Main Product Area */}
       <div className={`menu-page ${showModal ? "blur-bg" : ""}`}>
         <div className="menu-header">
           <h2>Product Menu</h2>
@@ -60,7 +69,6 @@ export default function AdminMenu() {
         )}
       </div>
 
-      {/* Add Product Modal */}
       {showModal && (
         <AddProduct
           onClose={() => setShowModal(false)}

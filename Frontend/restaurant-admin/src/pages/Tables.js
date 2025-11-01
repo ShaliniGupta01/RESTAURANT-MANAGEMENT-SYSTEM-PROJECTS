@@ -7,6 +7,7 @@ export default function Tables() {
   const [tables, setTables] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [nextTableNumber, setNextTableNumber] = useState(null);
 
   useEffect(() => {
     fetchTables();
@@ -16,22 +17,28 @@ export default function Tables() {
   const fetchTables = async () => {
     try {
       const res = await API.get("/api/tables");
-      if (Array.isArray(res.data)) setTables(res.data);
-      else if (res.data.tables) setTables(res.data.tables);
-      else setTables(res.data || []);
+      const data =
+        Array.isArray(res.data) ? res.data : res.data.tables || res.data || [];
+      setTables(data);
+
+      // determine next table number
+      const maxNum =
+        data.length > 0 ? Math.max(...data.map((t) => t.tableNumber || 0)) : 0;
+      setNextTableNumber(maxNum + 1);
     } catch (err) {
       console.error("Error fetching tables:", err);
       setTables([]);
     }
   };
 
-  // === Add a new table ===
+  // === Add new table ===
   const addTable = async (payload) => {
     try {
       setLoading(true);
       const res = await API.post("/api/tables", payload);
       setTables((prev) => [...prev, res.data]);
       setShowModal(false);
+      setNextTableNumber((prev) => prev + 1);
     } catch (err) {
       console.error("Error adding table:", err);
       alert("Failed to add table. Check backend connection.");
@@ -40,7 +47,7 @@ export default function Tables() {
     }
   };
 
-  // === Delete a table ===
+  // === Delete table ===
   const deleteTable = async (id) => {
     try {
       await API.delete(`/api/tables/${id}`);
@@ -66,7 +73,6 @@ export default function Tables() {
               <FaTrashAlt />
             </button>
 
-            {/* Display name first, then number */}
             <div className="table-name">{t.tableName || "Table"}</div>
             <div className="table-number">
               {String(t.tableNumber).padStart(2, "0")}
@@ -81,65 +87,63 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add Table Card */}
-        <div className="add-table-card" onClick={() => setShowModal(true)}>
-          <FaPlus className="plus-icon" />
-        </div>
-      </div>
-
-      {/* Create Table Modal */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Create New Table</h3>
-            <CreateTable
-              onCreate={(size, name) => addTable({ size, tableName: name })}
-              onCancel={() => setShowModal(false)}
-              loading={loading}
-            />
+        {/* Add Table Card + Popup */}
+        <div className="add-table-wrapper">
+          <div
+            className="add-table-card"
+            onClick={() => setShowModal((prev) => !prev)}
+            title="Add Table"
+          >
+            <FaPlus className="plus-icon" />
           </div>
+
+          {showModal && (
+            <div className="side-modal">
+              <button className="close-btn" onClick={() => setShowModal(false)}>
+                ✕
+              </button>
+
+              <label className="label">Table name (optional)</label>
+              <input
+                placeholder="Enter table name..."
+                className="input-field"
+                id="tableName"
+              />
+
+              <div className="table-number-big">
+                {String(nextTableNumber).padStart(2, "0")}
+              </div>
+
+              <hr className="divider" />
+
+              <label className="label">Chairs</label>
+              <select id="chairCount" className="select-field">
+                <option value="2">02</option>
+                <option value="4">04</option>
+                <option value="6">06</option>
+                <option value="8">08</option>
+              </select>
+
+              <button
+                className="btn-create-full"
+                disabled={loading}
+                onClick={() => {
+                  const name = document.getElementById("tableName").value;
+                  const size = Number(
+                    document.getElementById("chairCount").value
+                  );
+                  addTable({
+                    size,
+                    tableName: name,
+                    tableNumber: nextTableNumber,
+                  });
+                }}
+              >
+                {loading ? "Creating..." : "Create"}
+              </button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
-}
-
-// === Create Table Modal Component ===
-function CreateTable({ onCreate, onCancel, loading }) {
-  const [name, setName] = useState("");
-  const [size, setSize] = useState(2);
-
-  return (
-    <div className="modal-form">
-      <input
-        placeholder="Table name (optional)"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="input-field"
-      />
-
-      <select
-        value={size}
-        onChange={(e) => setSize(Number(e.target.value))}
-        className="select-field"
-      >
-        <option value={2}>2</option>
-        <option value={4}>4</option>
-        <option value={6}>6</option>
-        <option value={8}>8</option>
-      </select>
-
-      <div className="modal-actions">
-        <button
-          className="btn-create"
-          onClick={() => onCreate(size, name)}
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Create"}
-        </button>
-        <button className="btn-cancel" onClick={onCancel}>
-          Cancel
-        </button>
       </div>
     </div>
   );
