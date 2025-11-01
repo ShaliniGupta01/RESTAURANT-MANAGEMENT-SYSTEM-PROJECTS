@@ -31,7 +31,7 @@ export default function Tables() {
     }
   };
 
-  // === Add single new table ===
+  // === Add new table ===
   const addTable = async (payload) => {
     try {
       setLoading(true);
@@ -55,28 +55,6 @@ export default function Tables() {
     } catch (err) {
       console.error("Error deleting table:", err);
       alert("Failed to delete table.");
-    }
-  };
-
-  // === First-time create 30 tables ===
-  const createInitial30Tables = async () => {
-    if (!window.confirm("Create 30 tables for the first time?")) return;
-    setLoading(true);
-    try {
-      const bulkTables = Array.from({ length: 30 }, (_, i) => ({
-        tableNumber: i + 1,
-        size: 4, // default chairs per table
-        tableName: `Table-${i + 1}`,
-      }));
-
-      await Promise.all(bulkTables.map((t) => API.post("/api/tables", t)));
-      await fetchTables();
-      alert("30 tables created successfully!");
-    } catch (err) {
-      console.error("Error creating 30 tables:", err);
-      alert("Failed to create initial tables.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -109,21 +87,11 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* === Add Table Card === */}
+        {/* Add Table Card + Popup */}
         <div className="add-table-wrapper">
           <div
             className="add-table-card"
-            onClick={async () => {
-              if (tables.length === 0) {
-                // First click → create 30 tables
-                await createInitial30Tables();
-              } else if (tables.length >= 30 && tables.length < 31) {
-                // Then → open modal for table 31 only
-                setShowModal((prev) => !prev);
-              } else {
-                alert("You can only create up to 31 tables (1–31).");
-              }
-            }}
+            onClick={() => setShowModal((prev) => !prev)}
             title="Add Table"
           >
             <FaPlus className="plus-icon" />
@@ -164,12 +132,6 @@ export default function Tables() {
                   const size = Number(
                     document.getElementById("chairCount").value
                   );
-
-                  if (nextTableNumber > 31) {
-                    alert("You can only create Table 31.");
-                    return;
-                  }
-
                   addTable({
                     size,
                     tableName: name,

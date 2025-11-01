@@ -2,7 +2,6 @@ import React from "react";
 import "./ProductCard.css";
 
 export default function ProductCard({ item }) {
-  // CRA uses process.env.REACT_APP_...
   const backendURL =
     process.env.REACT_APP_API_BASE_URL ||
     "https://restaurant-backend-1rky.onrender.com";
@@ -20,17 +19,32 @@ export default function ProductCard({ item }) {
       </div>
 
       <div className="product-details">
-        <h3>{item.name}</h3>
-        <p>{item.description}</p>
+        <p>
+          <strong>Name:</strong> {item.name}
+        </p>
+        <p>
+          <strong>Description:</strong> {item.description}
+        </p>
         <p>
           <strong>Price:</strong> ₹{item.price}
         </p>
         <p>
           <strong>Category:</strong> {item.category}
         </p>
-        <p>
-          <strong>Stock:</strong> {item.stock > 0 ? "Yes" : "No"}
-        </p>
+
+        {/* Only show stock & rating if available */}
+        {item.stock > 0 && (
+          <>
+            <p>
+              <strong>Stock:</strong> Yes
+            </p>
+            {item.rating && (
+              <p>
+                <strong>Rating:</strong> ⭐ {item.rating}
+              </p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
