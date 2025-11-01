@@ -1,3 +1,5 @@
+
+
 import Order from "../models/orderModel.js";
 import Chef from "../models/chefModel.js";
 import Table from "../models/tableModel.js";
@@ -6,15 +8,15 @@ import Table from "../models/tableModel.js";
 const assignChef = async () => {
   const chefs = await Chef.find().sort({ ordersHandled: 1 });
   if (chefs.length === 0) {
-    console.log("No chefs available for assignment"); // Debug
+    console.log("No chefs available for assignment");
     return null;
   }
 
   const assignedChef = chefs[0];
-  console.log(`Assigning order to chef: ${assignedChef.name}, current ordersHandled: ${assignedChef.ordersHandled}`); // Debug
+  console.log(`Assigning order to chef: ${assignedChef.name}, current ordersHandled: ${assignedChef.ordersHandled}`);
   assignedChef.ordersHandled += 1;
   await assignedChef.save();
-  console.log(`Chef ${assignedChef.name} updated, new ordersHandled: ${assignedChef.ordersHandled}`); // Debug
+  console.log(`Chef ${assignedChef.name} updated, new ordersHandled: ${assignedChef.ordersHandled}`);
   return assignedChef.name;
 };
 
@@ -45,7 +47,7 @@ export const createOrder = async (req, res) => {
       user,
     } = req.body;
 
-    console.log(`Received order type: ${type}`); // Debug: Check incoming type
+    console.log(`Received order type: ${type}`);
 
     // Handle totals from frontend
     if (!totalAmount && totals?.grandTotal) {
@@ -58,14 +60,14 @@ export const createOrder = async (req, res) => {
       price: it.price ?? it.unitPrice ?? 0,
     }));
 
-    // Assign chef for ALL orders (dine-in and takeaway)
+    // Assign chef for ALL orders
     const assignedChef = await assignChef();
-    console.log(`Order assigned to chef: ${assignedChef} for type: ${type}`); // Debug
+    console.log(`Order assigned to chef: ${assignedChef} for type: ${type}`);
 
-    // Improved type check (case-insensitive)
+    // Improved type check
     const normalizedType = type?.toLowerCase().trim();
     const orderType = (normalizedType === "dine in" || normalizedType === "dinein") ? "Dine In" : "Takeaway";
-    console.log(`Final order type set to: ${orderType}`); // Debug
+    console.log(`Final order type set to: ${orderType}`);
 
     const newOrder = await Order.create({
       orderId: orderId || `ODR-${Date.now()}`,
@@ -86,7 +88,7 @@ export const createOrder = async (req, res) => {
 
     // Reserve table ONLY for dine-in
     if (orderType === "Dine In" && newOrder.tableNumber) {
-      console.log(`Reserving table ${newOrder.tableNumber} for dine-in`); // Debug
+      console.log(`Reserving table ${newOrder.tableNumber} for dine-in`);
       await Table.findOneAndUpdate(
         { tableNumber: Number(newOrder.tableNumber) },
         { reserved: true, $inc: { bookedFor: 1 } },
@@ -98,6 +100,28 @@ export const createOrder = async (req, res) => {
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(400).json({ message: error.message });
+  }
+};
+
+// Assign chefs to existing unassigned orders
+export const assignExistingOrders = async (req, res) => {
+  try {
+    const unassignedOrders = await Order.find({ assignedChef: { $exists: false } });
+    console.log(`Found ${unassignedOrders.length} unassigned orders`);
+
+    for (const order of unassignedOrders) {
+      const assignedChef = await assignChef();
+      if (assignedChef) {
+        order.assignedChef = assignedChef;
+        await order.save();
+        console.log(`Assigned ${assignedChef} to order ${order.orderId}`);
+      }
+    }
+
+    res.status(200).json({ message: `Assigned chefs to ${unassignedOrders.length} orders` });
+  } catch (error) {
+    console.error("Error assigning existing orders:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 

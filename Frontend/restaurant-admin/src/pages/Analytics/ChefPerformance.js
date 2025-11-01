@@ -1,10 +1,11 @@
 
+
 import React from "react";
 import "./ChefPerformance.css";
 
 const ChefPerformance = ({ chefPerformance }) => {
-  // Fixed list of chef names (as in your original code)
-  const fixedChefs = ["Harpal", "Kabir ", "Yogesh", "Satyaram"];
+  // Fixed list of chef names (expanded to include assigned chefs)
+  const fixedChefs = ["Harpal", "Kabir ", "Yogesh", "Satyaram", "Ram Narayan", "Mohan"];
 
   return (
     <div className="chef-performance-card">
@@ -17,8 +18,11 @@ const ChefPerformance = ({ chefPerformance }) => {
         </thead>
         <tbody>
           {fixedChefs.map((chefName) => {
-            // Find the ordersHandled from backend data (match by name)
-            const chefData = chefPerformance.find((c) => c.name === chefName);
+            // Find the ordersHandled from backend data (flexible match)
+            const chefData = chefPerformance.find((c) =>
+              c.name.toLowerCase().includes(chefName.toLowerCase().trim()) ||
+              chefName.toLowerCase().includes(c.name.toLowerCase().trim())
+            );
             const ordersTaken = chefData ? chefData.ordersHandled : 0;
 
             return (
