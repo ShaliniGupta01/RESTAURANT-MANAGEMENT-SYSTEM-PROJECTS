@@ -1,41 +1,10 @@
-import React, { useState, useRef } from "react";
+
+import React from "react";
 import "./ChefPerformance.css";
 
-const ChefPerformance = React.forwardRef((props, ref) => {
-  const [chefs, setChefs] = useState([
-    { name: "Harpal", orders: 0 },
-    { name: "Kabir ", orders: 0 },
-    { name: "Yogesh", orders: 0 },
-    { name: "Satyaram", orders: 0 },
-  ]);
-
-  const chefIndex = useRef(0); // tracks next chef for assignment
-
-  // ---- public method to assign order ----
-  const assignOrder = () => {
-    setChefs((prev) => {
-      const updated = [...prev];
-      const current = chefIndex.current % updated.length;
-      updated[current].orders += 1;
-      chefIndex.current += 1;
-
-      // simulate order completion after 5s
-      setTimeout(() => {
-        setChefs((prevState) => {
-          const dec = [...prevState];
-          if (dec[current].orders > 0) dec[current].orders -= 1;
-          return dec;
-        });
-      }, 5000);
-
-      return updated;
-    });
-  };
-
-  // expose assignOrder to parent via ref
-  React.useImperativeHandle(ref, () => ({
-    assignOrder,
-  }));
+const ChefPerformance = ({ chefPerformance }) => {
+  // Fixed list of chef names (as in your original code)
+  const fixedChefs = ["Harpal", "Kabir ", "Yogesh", "Satyaram"];
 
   return (
     <div className="chef-performance-card">
@@ -47,16 +16,22 @@ const ChefPerformance = React.forwardRef((props, ref) => {
           </tr>
         </thead>
         <tbody>
-          {chefs.map((chef) => (
-            <tr key={chef.name}>
-              <td>{chef.name}</td>
-              <td>{chef.orders}</td>
-            </tr>
-          ))}
+          {fixedChefs.map((chefName) => {
+            // Find the ordersHandled from backend data (match by name)
+            const chefData = chefPerformance.find((c) => c.name === chefName);
+            const ordersTaken = chefData ? chefData.ordersHandled : 0;
+
+            return (
+              <tr key={chefName}>
+                <td>{chefName}</td>
+                <td>{ordersTaken}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
-});
+};
 
 export default ChefPerformance;

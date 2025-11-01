@@ -10,6 +10,8 @@ export const getChefs = async (req, res) => {
   }
 };
 
+
+
 // Add new chef
 export const addChef = async (req, res) => {
   try {
@@ -20,3 +22,4 @@ export const addChef = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+

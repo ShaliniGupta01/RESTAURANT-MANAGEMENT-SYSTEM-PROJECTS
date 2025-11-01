@@ -10,3 +10,5 @@ const chefSchema = new mongoose.Schema(
 
 const Chef = mongoose.model("Chef", chefSchema);
 export default Chef;
+
+

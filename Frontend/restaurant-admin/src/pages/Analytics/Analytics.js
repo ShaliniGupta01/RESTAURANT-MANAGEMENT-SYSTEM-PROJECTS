@@ -1,3 +1,5 @@
+
+
 import React, {
   useEffect,
   useState,
@@ -14,7 +16,6 @@ import TablesOverview from "./TablesOverview";
 import ChefPerformance from "./ChefPerformance";
 import { useSearch } from "../../context/SearchContext";
 
-// forwardRef allows parent (AdminDashboard) to call refresh()
 const Analytics = forwardRef((props, ref) => {
   const { searchTerm } = useSearch();
 
@@ -36,32 +37,7 @@ const Analytics = forwardRef((props, ref) => {
   const [filter, setFilter] = useState("Daily");
   const [loading, setLoading] = useState(false);
 
-  //  Generate random chef performance (mock data)
-  const generateChefPerformance = useCallback((totalOrders = 20) => {
-    const chefs = ["Mohan", "Pritam", "Yash", "Rahul"];
-
-    const performance = chefs.map((chef) => ({
-      name: chef,
-      totalOrders: 0,
-      served: 0,
-      pending: 0,
-    }));
-
-    for (let i = 0; i < totalOrders; i++) {
-      const randomChef =
-        performance[Math.floor(Math.random() * performance.length)];
-      randomChef.totalOrders += 1;
-    }
-
-    performance.forEach((chef) => {
-      chef.served = Math.floor(Math.random() * chef.totalOrders);
-      chef.pending = chef.totalOrders - chef.served;
-    });
-
-    return performance;
-  }, []);
-
-  //  Fetch analytics from backend
+  // Fetch analytics from backend
   const fetchAnalyticsData = useCallback(
     async (selectedFilter = filter) => {
       try {
@@ -74,35 +50,34 @@ const Analytics = forwardRef((props, ref) => {
         setStats(data.stats || {});
         setOrders(data.orders || {});
         setRevenueData(data.revenue || []);
-        setChefPerformance(generateChefPerformance(25));
+        setChefPerformance(data.chefs || []);
       } catch (error) {
-        console.error(" Error fetching analytics data:", error);
+        console.error("Error fetching analytics data:", error);
       } finally {
         setLoading(false);
       }
     },
-    [generateChefPerformance, filter]
+    [filter]
   );
 
-  //  Allow parent (AdminDashboard) to trigger a refresh instantly
+  // Allow parent to trigger refresh
   useImperativeHandle(ref, () => ({
     refresh() {
       fetchAnalyticsData(filter);
     },
   }));
 
-  //  Fetch on load or filter change
+  // Fetch on load or filter change
   useEffect(() => {
     fetchAnalyticsData(filter);
   }, [filter, fetchAnalyticsData]);
 
-  //  Blur logic (for SearchContext)
+  // Blur logic
   const getBlurClass = (section) => {
-    if (!searchTerm) return ""; // show all if empty
+    if (!searchTerm) return "";
 
     const term = searchTerm.toLowerCase().trim();
 
-    // --- Show only StatsRow for "total" searches ---
     if (
       term === "total" ||
       term.includes("total chef") ||
@@ -114,7 +89,6 @@ const Analytics = forwardRef((props, ref) => {
       return section === "stats" ? "" : "blurred";
     }
 
-    // --- Section-specific searches ---
     if (term.includes("ordersummary"))
       return section === "orderSummary" ? "" : "blurred";
     if (term.includes("revenue chart"))
@@ -123,7 +97,6 @@ const Analytics = forwardRef((props, ref) => {
       return section === "tablesOverview" ? "" : "blurred";
     if (term.includes("chef")) return section === "chef" ? "" : "blurred";
 
-    // Default: show all
     return "";
   };
 
@@ -131,12 +104,10 @@ const Analytics = forwardRef((props, ref) => {
     <div className="analytics-page">
       <h3>Analytics</h3>
 
-      {/* === Stats Row === */}
       <div className={getBlurClass("stats")}>
         <StatsRow stats={stats} />
       </div>
 
-      {/* === Analytics Grid === */}
       <div className="analytics-grid">
         <div className={getBlurClass("orderSummary")}>
           <OrderSummary
@@ -161,7 +132,6 @@ const Analytics = forwardRef((props, ref) => {
         </div>
       </div>
 
-      {/* === Chef Performance === */}
       <div className={getBlurClass("chef")}>
         <ChefPerformance chefPerformance={chefPerformance} />
       </div>

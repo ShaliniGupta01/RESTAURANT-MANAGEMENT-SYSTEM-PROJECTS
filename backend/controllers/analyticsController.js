@@ -1,3 +1,5 @@
+
+
 import Order from "../models/orderModel.js";
 import Chef from "../models/chefModel.js";
 
@@ -36,8 +38,7 @@ export const getAnalytics = async (req, res) => {
       },
     ]);
 
-    //  Correct Served Logic
-    // Count all orders where status = "Served" OR status = "Done"
+    // Correct Served Logic
     const servedCount = await Order.countDocuments({
       $or: [{ status: /served/i }, { status: /done/i }],
     });
@@ -53,7 +54,7 @@ export const getAnalytics = async (req, res) => {
         typeAgg.find((t) => t._id.includes("take"))?.count || 0,
     };
 
-    //  Revenue Series for Chart
+    // Revenue Series for Chart
     const revenueSeries = await Order.aggregate([
       {
         $group: {
@@ -70,11 +71,15 @@ export const getAnalytics = async (req, res) => {
       value: r.total,
     }));
 
+    // Fetch real chef data (names and ordersHandled)
+    const chefs = await Chef.find({}, 'name ordersHandled').sort({ ordersHandled: -1 });
+
     // Final Response
     res.json({
       stats: { totalOrders, totalChefs, totalRevenue, totalClients },
       orders,
       revenue,
+      chefs, // Array of { name, ordersHandled }
     });
   } catch (error) {
     console.error("Error in getAnalytics:", error);
