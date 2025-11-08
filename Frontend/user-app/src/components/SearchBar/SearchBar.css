@@ -2,25 +2,28 @@
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 340px;
-  background: #f4f8f6;
-  border-radius: 12px;
-  padding: 8px 14px;
+  max-width: 348px; 
+  background: #f0f1f0;
+  border-radius: 10px;
+  padding: 6px 12px;
   box-sizing: border-box;
+  border: 1px solid #f0f1f0; 
 }
 
 .search-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   opacity: 0.5;
   margin-right: 10px;
 }
 
 .search-input {
   flex: 1;
-  border: none;
+  border: 1px solid #f0f1f0;
   outline: none;
-  background: transparent;
+  background: #f0f1f0; 
+  border-radius: 8px; 
+  padding: 6px 10px;
   font-size: 14px;
   color: #333;
 }

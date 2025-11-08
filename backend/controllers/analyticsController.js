@@ -3,35 +3,56 @@ import Chef from "../models/chefModel.js";
 
 export const getAnalytics = async (req, res) => {
   try {
-    // Basic stats
+    // --- Basic Stats ---
     const totalOrders = await Order.countDocuments();
     const totalChefs = await Chef.countDocuments();
+
     const revenueAgg = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
     const totalRevenue = revenueAgg[0]?.total || 0;
-    const totalClients = await Order.distinct("phoneNumber")
-      .then((arr) => arr.filter(Boolean).length);
 
-    // Order breakdown by status and type
+    const totalClients = await Order.distinct("phoneNumber").then((arr) =>
+      arr.filter(Boolean).length
+    );
+
+    // --- Status Breakdown ---
     const statusAgg = await Order.aggregate([
-      { $group: { _id: "$status", count: { $sum: 1 } } },
-    ]);
-    const typeAgg = await Order.aggregate([
-      { $group: { _id: "$type", count: { $sum: 1 } } },
+      {
+        $group: {
+          _id: { $toLower: { $trim: { input: "$status" } } },
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
+    // --- Type Breakdown ---
+    const typeAgg = await Order.aggregate([
+      {
+        $group: {
+          _id: { $toLower: { $trim: { input: "$type" } } },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // --- Served Count ---
+    const servedCount = await Order.countDocuments({
+      $or: [{ status: /served/i }, { status: /done/i }],
+    });
+
+    // --- Orders Summary ---
     const orders = {
-      served: statusAgg.find((s) => s._id === "Served")?.count || 0,
-      processing: statusAgg.find((s) => s._id === "Processing")?.count || 0,
-      done: statusAgg.find((s) => s._id === "Done")?.count || 0,
-      dineIn: typeAgg.find((t) => t._id === "Dine In")?.count || 0,
+      served: servedCount,
+      processing:
+        statusAgg.find((s) => s._id === "processing")?.count || 0,
+      dineIn:
+        typeAgg.find((t) => t._id.includes("dine"))?.count || 0,
       takeAway:
-        typeAgg.find((t) => t._id === "Takeaway" || t._id === "Take Away")
-          ?.count || 0,
+        typeAgg.find((t) => t._id.includes("take"))?.count || 0,
     };
 
-    // Revenue timeseries (last 30 days)
+    // --- Revenue Series (for chart display) ---
     const revenueSeries = await Order.aggregate([
       {
         $group: {
@@ -48,18 +69,20 @@ export const getAnalytics = async (req, res) => {
       value: r.total,
     }));
 
+    // --- Chef Performance Data ---
+    const chefs = await Chef.find({}, "name ordersHandled").sort({
+      ordersHandled: -1,
+    });
+
+    // --- Final Response ---
     res.json({
-      stats: {
-        totalOrders,
-        totalChefs,
-        totalRevenue,
-        totalClients,
-      },
+      stats: { totalOrders, totalChefs, totalRevenue, totalClients },
       orders,
       revenue,
+      chefs, // [{ name, ordersHandled }]
     });
   } catch (error) {
-    console.error("Error fetching analytics:", error);
+    console.error("Error in getAnalytics:", error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from "react";
 import ChartCard from "../../components/ChartCard";
-import axios from "axios";
+import axios from "../../api/axios";
 import "./TablesOverview.css";
 
 export default function TablesOverview() {
@@ -15,10 +14,16 @@ export default function TablesOverview() {
 
   const fetchTables = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/tables");
-      let data = res.data || [];
+      const res = await axios.get(
+        "https://restaurant-backend-1rky.onrender.com/api/tables"
+      ); //  Correct route
+      let data = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data?.tables)
+        ? res.data.tables
+        : [];
 
-      // ensure always 30 tables
+      // Ensure always 30 placeholders
       if (data.length < 30) {
         const extra = Array.from({ length: 30 - data.length }, (_, i) => ({
           tableNumber: data.length + i + 1,
@@ -26,9 +31,16 @@ export default function TablesOverview() {
         }));
         data = [...data, ...extra];
       }
+
       setTables(data);
     } catch (err) {
       console.error("Error fetching tables:", err);
+      // fallback sample for frontend testing
+      const sample = Array.from({ length: 30 }, (_, i) => ({
+        tableNumber: i + 1,
+        reserved: i % 4 === 0,
+      }));
+      setTables(sample);
     }
   };
 
@@ -49,16 +61,22 @@ export default function TablesOverview() {
       <hr className="divider" />
 
       <div className="table-grid-preview">
-        {tables.map((t, index) => (
-          <div
-            key={t._id || index}
-            className={`mini-table ${t.reserved ? "reserved" : "available"}`}
-          >
-            <div>Table</div>
-            <div>{String(t.tableNumber).padStart(2, "0")}</div>
-          </div>
-        ))}
+        {Array.isArray(tables) && tables.length > 0 ? (
+          tables.map((t, index) => (
+            <div
+              key={t._id || index}
+              className={`mini-table ${t.reserved ? "reserved" : "available"}`}
+            >
+              <div>Table</div>
+              <div>{String(t.tableNumber).padStart(2, "0")}</div>
+            </div>
+          ))
+        ) : (
+          <p className="no-tables">No tables found</p>
+        )}
       </div>
     </ChartCard>
   );
 }
+
+

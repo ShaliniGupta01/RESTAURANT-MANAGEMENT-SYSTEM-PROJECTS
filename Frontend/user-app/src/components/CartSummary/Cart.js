@@ -1,12 +1,10 @@
-
 import React, { useState, useRef } from "react";
 import { useSwipeable } from "react-swipeable";
 import "./Cart.css";
 
-export default function CartSummary({ cart, user, orderType, onPlaceOrder }) {
+export default function Cart({ cart, user, orderType, onPlaceOrder }) {
   const [swiped, setSwiped] = useState(false);
   const sliderRef = useRef(null);
-  
 
   const handleOrder = () => {
     if (!swiped) {
@@ -28,10 +26,9 @@ export default function CartSummary({ cart, user, orderType, onPlaceOrder }) {
   const grandTotal = itemsTotal + delivery + taxes;
 
   return (
-     
     <div className="summary-card">
       {/* ------ PRICE SECTION ------ */}
-     
+
       <div className="price-section">
         <div className="row">
           <span>Item Total</span>

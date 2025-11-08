@@ -24,11 +24,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e4e4e4;
+  border: 1px solid #a5a4a4;
   border-radius: 12px;
   padding: 10px 14px;
   background: #fff;
-  color: #444;
+  color: #393939;
   min-width: 80px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
@@ -36,14 +36,14 @@
 }
 
 .cat-btn:hover {
-  background: #f5f5f5;
+  background: #ede8e8;
 }
 
 .cat-btn.active {
-  background: #444;
+  background: #454444;
   color: #fff;
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(98, 98, 98, 0.15);
 }
 
 .cat-icon {
@@ -51,6 +51,21 @@
 }
 
 .cat-label {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 500;
+}
+
+.cat-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: brightness(0); 
+}
+
+/* On hover or active, make all icons white */
+.cat-btn:hover .cat-img,
+.cat-btn.active .cat-img {
+  filter: brightness(0) invert(1); 
+  transform: scale(1.1);
 }

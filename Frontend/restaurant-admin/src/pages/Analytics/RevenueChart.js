@@ -2,11 +2,11 @@ import React from "react";
 import {
   LineChart,
   Line,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Bar,
 } from "recharts";
 import { FaAngleDown } from "react-icons/fa6";
 import ChartCard from "../../components/ChartCard";
@@ -25,6 +25,18 @@ const TimeFilter = ({ selected, setSelected }) => (
 );
 
 export default function RevenueChart({ lineData, revenueFilter, setRevenueFilter }) {
+  //  Dynamically format the day labels (Sun, Mon, Tue...)
+  const formatDayLabel = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { weekday: "short" }); // e.g., Mon, Tue
+  };
+
+  //  Transform your data to include day names
+  const formattedData = lineData.map((item) => ({
+    ...item,
+    name: formatDayLabel(item.date || item.name), 
+  }));
+
   return (
     <ChartCard title="Revenue" className="revenue-card">
       <div className="chart-header-controls">
@@ -34,46 +46,35 @@ export default function RevenueChart({ lineData, revenueFilter, setRevenueFilter
         </div>
         <TimeFilter selected={revenueFilter} setSelected={setRevenueFilter} />
       </div>
-
-      {/* White chart background container */}
-      <div className="revenue-chart-container">
-        <ResponsiveContainer width="100%" height={180}>
-          <LineChart data={lineData}>
-            <XAxis dataKey="name" axisLine={false} tickLine={false} />
-            <YAxis hide={true} domain={[0, 1000]} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "6px",
-              }}
-            />
-            <defs>
-              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-
-            {/* Light gray background bars */}
-            <Bar
-              dataKey="value"
-              fill="#E5E7EB"
-              barSize={20}
-              radius={[4, 4, 0, 0]}
-            />
-
-            {/* Revenue Line */}
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#1f2937"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+    <div className="revenue-chart-container">
+  <ResponsiveContainer width="100%" height="100%">
+    <LineChart data={formattedData}>
+      <XAxis
+        dataKey="name"
+        axisLine={false}
+        tickLine={false}
+        tick={{ fill: "#6b7280", fontSize: 12 }}
+        padding={{ left: 10, right: 10 }}
+      />
+      <YAxis hide={true} />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: "#ffffff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "6px",
+        }}
+      />
+      <Bar dataKey="value" fill="#E5E7EB" barSize={30} radius={[6, 6, 0, 0]} />
+      <Line
+        type="monotone"
+        dataKey="value"
+        stroke="#1f2937"
+        strokeWidth={2}
+        dot={false}
+      />
+    </LineChart>
+  </ResponsiveContainer>
+</div>
     </ChartCard>
   );
 }

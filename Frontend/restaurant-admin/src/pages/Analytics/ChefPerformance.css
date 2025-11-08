@@ -1,8 +1,8 @@
-.chef-performance-card {
+ .chef-performance-card {
   background: #ffffff;
   border: 2px solid #d9d9d9;
   border-radius: 12px;
-  padding: 16px;
+  padding: 2px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
@@ -39,4 +39,4 @@
 
 .chef-table tr:hover {
   background-color: #f9fafb;
-}
+} 

@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from "react";
+
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import API from "../../api/axios";
 import "./Analytics.css";
 import StatsRow from "./StatsRow";
@@ -6,9 +13,11 @@ import OrderSummary from "./OrderSummary";
 import RevenueChart from "./RevenueChart";
 import TablesOverview from "./TablesOverview";
 import ChefPerformance from "./ChefPerformance";
+import { useSearch } from "../../context/SearchContext";
 
-export default function Analytics() {
-  //  initialize all states with safe defaults
+const Analytics = forwardRef((props, ref) => {
+  const { searchTerm } = useSearch();
+
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -19,6 +28,7 @@ export default function Analytics() {
     served: 0,
     dineIn: 0,
     takeAway: 0,
+    done: 0,
   });
 
   const [chefPerformance, setChefPerformance] = useState([]);
@@ -26,96 +36,113 @@ export default function Analytics() {
   const [filter, setFilter] = useState("Daily");
   const [loading, setLoading] = useState(false);
 
-  const chefs = ["Mohan", "Pritam", "Yash", "Rahul"];
+  // Fetch analytics from backend
+  const fetchAnalyticsData = useCallback(
+    async (selectedFilter = filter) => {
+      try {
+        setLoading(true);
+        const response = await API.get(
+          `/api/analytics?filter=${selectedFilter.toLowerCase()}`
+        );
 
-  // Function to simulate assigning random orders to chefs
-  const generateChefPerformance = (totalOrders = 20) => {
-    const performance = chefs.map((chef) => ({
-      name: chef,
-      totalOrders: 0,
-      served: 0,
-      pending: 0,
-    }));
+        const data = response.data || {};
+        setStats(data.stats || {});
+        setOrders(data.orders || {});
+        setRevenueData(data.revenue || []);
+        setChefPerformance(data.chefs || []);
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filter]
+  );
 
-    // Randomly assign orders to chefs
-    for (let i = 0; i < totalOrders; i++) {
-      const randomChef =
-        performance[Math.floor(Math.random() * performance.length)];
-      randomChef.totalOrders += 1;
-    }
+  // Allow parent to trigger refresh
+  useImperativeHandle(ref, () => ({
+    refresh() {
+      fetchAnalyticsData(filter);
+    },
+  }));
 
-    // Simulate served vs pending
-    performance.forEach((chef) => {
-      chef.served = Math.floor(Math.random() * chef.totalOrders);
-      chef.pending = chef.totalOrders - chef.served;
-    });
-
-    return performance;
-  };
-
-  const fetchAnalyticsData = async (selectedFilter) => {
-    try {
-      setLoading(true);
-      const response = await API.get(
-        `/analytics?filter=${selectedFilter.toLowerCase()}`
-      );
-      const data = response.data || {};
-
-      //  safely update states
-      setStats(data.stats || {});
-      setOrders(data.orders || {});
-      setRevenueData(data.revenue || []);
-
-      // simulate chef performance dynamically
-      const simulatedChefPerformance = generateChefPerformance(25);
-      setChefPerformance(simulatedChefPerformance);
-    } catch (error) {
-      console.error("Error fetching analytics data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch on load or filter change
   useEffect(() => {
     fetchAnalyticsData(filter);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [filter, fetchAnalyticsData]);
+
+  // Blur logic
+  const getBlurClass = (section) => {
+    if (!searchTerm) return "";
+
+    const term = searchTerm.toLowerCase().trim();
+
+    if (
+      term === "total" ||
+      term.includes("total chef") ||
+      term.includes("total order") ||
+      term.includes("total revenue") ||
+      term.includes("total client") ||
+      term.includes("total clients")
+    ) {
+      return section === "stats" ? "" : "blurred";
+    }
+
+    if (term.includes("ordersummary"))
+      return section === "orderSummary" ? "" : "blurred";
+    if (term.includes("revenue chart"))
+      return section === "revenueChart" ? "" : "blurred";
+    if (term.includes("tables") || term.includes("table"))
+      return section === "tablesOverview" ? "" : "blurred";
+    if (term.includes("chef")) return section === "chef" ? "" : "blurred";
+
+    return "";
+  };
 
   return (
     <div className="analytics-page">
       <h3>Analytics</h3>
 
-      {/* 1. Stats Row */}
-      <StatsRow stats={stats} />
-
-      {/* 2. Analytics Grid */}
-      <div className="analytics-grid">
-        {/* Order Summary */}
-        <OrderSummary
-          served={orders?.served || 0}
-          dineIn={orders?.dineIn || 0}
-          takeAway={orders?.takeAway || 0}
-          filter={filter}
-          setFilter={setFilter}
-        />
-
-        {/* Revenue Chart */}
-        <RevenueChart
-          lineData={revenueData}
-          revenueFilter={filter}
-          setRevenueFilter={setFilter}
-        />
-
-        {/* Tables Overview */}
-        <TablesOverview />
+      <div className={getBlurClass("stats")}>
+        <StatsRow stats={stats} />
       </div>
 
-      {/* 3. Chef Performance */}
-      <ChefPerformance chefPerformance={chefPerformance} />
+      <div className="analytics-grid">
+        <div className={getBlurClass("orderSummary")}>
+          <OrderSummary
+            served={orders?.served || 0}
+            dineIn={orders?.dineIn || 0}
+            takeAway={orders?.takeAway || 0}
+            filter={filter}
+            setFilter={setFilter}
+          />
+        </div>
+
+        <div className={getBlurClass("revenueChart")}>
+          <RevenueChart
+            lineData={revenueData}
+            revenueFilter={filter}
+            setRevenueFilter={setFilter}
+          />
+        </div>
+
+        <div className={getBlurClass("tablesOverview")}>
+          <TablesOverview />
+        </div>
+      </div>
+
+      <div className={getBlurClass("chef")}>
+        <ChefPerformance chefPerformance={chefPerformance} />
+      </div>
 
       {loading && (
-        <p style={{ textAlign: "center", fontSize: "12px" }}>Loading data...</p>
+        <p style={{ textAlign: "center", fontSize: "12px" }}>
+          Loading data...
+        </p>
       )}
     </div>
   );
-}
+});
+
+export default Analytics;
+

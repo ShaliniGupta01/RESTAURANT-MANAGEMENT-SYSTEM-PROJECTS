@@ -7,30 +7,34 @@ export default function Tables() {
   const [tables, setTables] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [nextTableNumber, setNextTableNumber] = useState(null);
 
   useEffect(() => {
     fetchTables();
   }, []);
 
-  // Fetch all tables
+  // === Fetch all tables ===
   const fetchTables = async () => {
     try {
-      const res = await API.get("/tables");
-      if (Array.isArray(res.data)) setTables(res.data);
-      else if (res.data.tables) setTables(res.data.tables);
-      else setTables(res.data || []);
+      const res = await API.get("/api/tables");
+      const data = Array.isArray(res.data) ? res.data : res.data?.tables || [];
+      setTables(data);
+
+      const maxNum =
+        data.length > 0 ? Math.max(...data.map((t) => t.tableNumber || 0)) : 0;
+      setNextTableNumber(maxNum + 1);
     } catch (err) {
       console.error("Error fetching tables:", err);
       setTables([]);
     }
   };
 
-  // Add a table (POST)
+  // === Add new table ===
   const addTable = async (payload) => {
     try {
       setLoading(true);
-      const res = await API.post("/tables", payload);
-      setTables((prev) => [...prev, res.data]);
+      await API.post("/api/tables", payload);
+      await fetchTables(); // ensures fresh list with correct _id
       setShowModal(false);
     } catch (err) {
       console.error("Error adding table:", err);
@@ -40,14 +44,16 @@ export default function Tables() {
     }
   };
 
-  // Delete table
+  // === Delete table ===
   const deleteTable = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this table?")) return;
     try {
-      await API.delete(`/tables/${id}`);
-      setTables((prev) => prev.filter((t) => t._id !== id));
+      console.log("Deleting table ID:", id);
+      await API.delete(`/api/tables/${id}`);
+      await fetchTables(); // refresh after delete
     } catch (err) {
       console.error("Error deleting table:", err);
-      alert("Failed to delete table.");
+      alert("Failed to delete table. Check if ID exists in backend.");
     }
   };
 
@@ -57,7 +63,7 @@ export default function Tables() {
 
       <div className="tables-grid">
         {tables.map((t) => (
-          <div key={t._id} className="table-card">
+          <div key={t._id || t.tableNumber} className="table-card">
             <button
               className="delete-icon"
               onClick={() => deleteTable(t._id)}
@@ -66,7 +72,6 @@ export default function Tables() {
               <FaTrashAlt />
             </button>
 
-            {/* Updated order: Name first, number second */}
             <div className="table-name">{t.tableName || "Table"}</div>
             <div className="table-number">
               {String(t.tableNumber).padStart(2, "0")}
@@ -81,68 +86,62 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add Table Button */}
-        <div className="add-table-card" onClick={() => setShowModal(true)}>
-          <FaPlus className="plus-icon" />
-        </div>
-      </div>
-
-      {/* Modal for Creating Table */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Create New Table</h3>
-            <CreateTable
-              onCreate={(size, name) => addTable({ size, tableName: name })}
-              onCancel={() => setShowModal(false)}
-              loading={loading}
-            />
+        {/* Add Table */}
+        <div className="add-table-wrapper">
+          <div
+            className="add-table-card"
+            onClick={() => setShowModal((prev) => !prev)}
+            title="Add Table"
+          >
+            <FaPlus className="plus-icon" />
           </div>
+
+          {showModal && (
+            <div className="side-modal">
+              <button className="close-btn" onClick={() => setShowModal(false)}>
+                ✕
+              </button> 
+              <label className="label">Table name (optional)</label>
+              <input
+                placeholder="Enter table name..."
+                className="input-field"
+                id="tableName"
+              />
+              <div className="table-number-big">
+                {String(nextTableNumber).padStart(2, "0")}
+              </div>
+
+              <hr className="divider" />
+
+              <label className="label">Chairs</label>
+              <select id="chairCount" className="select-field">
+                <option value="2">02</option>
+                <option value="4">04</option>
+                <option value="6">06</option>
+                <option value="8">08</option>
+              </select>
+
+              <button
+                className="btn-create-full"
+                disabled={loading}
+                onClick={() => {
+                  const name = document.getElementById("tableName").value;
+                  const size = Number(
+                    document.getElementById("chairCount").value
+                  );
+                  addTable({
+                    size,
+                    tableName: name,
+                    tableNumber: nextTableNumber,
+                  });
+                }}
+              >
+                {loading ? "Creating..." : "Create"}
+              </button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
-}
-
-function CreateTable({ onCreate, onCancel, loading }) {
-  const [name, setName] = useState("");
-  const [size, setSize] = useState(2);
-
-  return (
-    <div className="modal-form">
-      <input
-        placeholder="Table name (optional)"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="input-field"
-      />
-
-      <select
-        value={size}
-        onChange={(e) => setSize(Number(e.target.value))}
-        className="select-field"
-      >
-        <option value={2}>2</option>
-        <option value={4}>4</option>
-        <option value={6}>6</option>
-        <option value={8}>8</option>
-      </select>
-
-      <div className="modal-actions">
-        <button
-          className="btn-create"
-          onClick={() => onCreate(size, name)}
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Create"}
-        </button>
-        <button className="btn-cancel" onClick={onCancel}>
-          Cancel
-        </button>
       </div>
     </div>
   );
 }
-
-
-

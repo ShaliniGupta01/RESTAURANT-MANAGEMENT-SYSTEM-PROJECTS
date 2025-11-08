@@ -1,62 +1,117 @@
+
+
 import React, { useState, useEffect } from "react";
 import api from "../../api/axios";
 import "./UserDetails.css";
 
-export default function Details({ visible, onSave }) {
-    const [name, setName] = useState("");
-    const [members, setMembers] = useState(2);
-    const [address, setAddress] = useState("");
-    const [phone, setPhone] = useState("");
-    const [saving, setSaving] = useState(false);
+export default function UserDetails({ visible, onSave }) {
+  const [name, setName] = useState("");
+  const [members, setMembers] = useState(2);
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        const local = JSON.parse(localStorage.getItem("rms_user"));
-        if (local) {
-            setName(local.name || "");
-            setMembers(local.members || 2);
-            setAddress(local.address || "");
-            setPhone(local.phone || "");
-        }
-    }, []);
+  useEffect(() => {
+    const local = JSON.parse(localStorage.getItem("rms_user"));
+    if (local) {
+      setName(local.name || "");
+      setMembers(local.members || 2);
+      setAddress(local.address || "");
+      setPhone(local.phone || "");
+    }
+  }, []);
 
-    if (!visible) return null;
+  if (!visible) return null;
 
-    const handleSave = async () => {
-        if (!name || !phone) {
-            alert("Please provide name and contact");
-            return;
-        }
-        if (members < 1 || members > 8) {
-            alert("Members must be between 1 and 8");
-            return;
-        }
-        const user = { name, members, address, phone };
+  const handleMembersChange = (e) => {
+    const val = e.target.value;
+    if (val === "") {
+      setMembers("");
+      return;
+    }
+    const num = Number(val);
+    if (num >= 1 && num <= 8) {
+      setMembers(num);
+    }
+  };
 
-        // try to post to backend /users (optional)
-        setSaving(true);
-        try {
-            await api.post("/users", user);
-        } catch (err) {
-            // ignore errors (still save locally)
-        } finally {
-            setSaving(false);
-            localStorage.setItem("rms_user", JSON.stringify(user));
-            onSave(user);
-        }
-    };
+  const handleSave = async () => {
+    if (!name || !phone) {
+      alert("Please provide name and contact");
+      return;
+    }
+    if (members < 1 || members > 8) {
+      alert("Members must be between 1 and 8");
+      return;
+    }
 
-    return (
-        <div className="dm-overlay">
-            <div className="dm-card">
-                <h3>Enter Your Details</h3>
-                <input placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
-                <input type="number" min="1" max="8" placeholder="Number of Person (max 8)" value={members} onChange={e => setMembers(Math.max(1, Math.min(8, Number(e.target.value))))} />
-                <input placeholder="Address" value={address} onChange={e => setAddress(e.target.value)} />
-                <input placeholder="Contact (mobile number)" value={phone} onChange={e => setPhone(e.target.value)} />
-                <div className="dm-actions">
-                    <button onClick={handleSave} className="btn-save" disabled={saving}>{saving ? "Saving..." : "Order Now"}</button>
-                </div>
-            </div>
+    const user = { name, members, address, phone };
+
+    setSaving(true);
+    try {
+      await api.post("/users", user);
+    } catch (err) {
+      // ignore backend save errors
+    } finally {
+      setSaving(false);
+      localStorage.setItem("rms_user", JSON.stringify(user));
+      onSave(user);
+    }
+  };
+
+  return (
+    <div className="dm-overlay">
+      <div className="dm-card">
+        <h3>Enter Your Details</h3>
+
+        <div className="form-group">
+          <label>Name</label>
+          <input
+            type="text"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </div>
-    );
+
+        <div className="form-group">
+          <label>Number of Person</label>
+          <input
+            type="number"
+            min="1"
+            max="8"
+            placeholder="1–8"
+            value={members}
+            onChange={handleMembersChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Address</label>
+          <input
+            type="text"
+            placeholder="Enter address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Contact</label>
+          <input
+            type="text"
+            placeholder="Mobile number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+
+        <div className="dm-actions">
+          <button onClick={handleSave} className="btn-save" disabled={saving}>
+            {saving ? "Saving..." : "Order Now"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

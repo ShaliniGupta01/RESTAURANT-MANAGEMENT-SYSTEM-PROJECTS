@@ -2,14 +2,19 @@ import Order from "../models/orderModel.js";
 import Chef from "../models/chefModel.js";
 import Table from "../models/tableModel.js";
 
-// Assign chef with fewer orders
+// Assign chef with least handled orders
 const assignChef = async () => {
   const chefs = await Chef.find().sort({ ordersHandled: 1 });
-  if (chefs.length === 0) return null;
+  if (chefs.length === 0) {
+    console.log("No chefs available for assignment"); // TEMP: Debug
+    return null;
+  }
 
   const assignedChef = chefs[0];
+  console.log(`Assigning order to chef: ${assignedChef.name}, current ordersHandled: ${assignedChef.ordersHandled}`); // TEMP: Debug
   assignedChef.ordersHandled += 1;
   await assignedChef.save();
+  console.log(`Chef ${assignedChef.name} updated, new ordersHandled: ${assignedChef.ordersHandled}`); // TEMP: Debug
   return assignedChef.name;
 };
 
@@ -40,75 +45,75 @@ export const createOrder = async (req, res) => {
       user,
     } = req.body;
 
-    // If frontend sent totals.grandTotal, use it
-    if (!totalAmount && totals && totals.grandTotal) {
+    // Handle totals from frontend
+    if (!totalAmount && totals?.grandTotal) {
       totalAmount = Number(totals.grandTotal);
     }
 
-    // Map items to schema { name, quantity, price }
-    const mappedItems = (items || []).map((it) => {
-      // admin might send { name, quantity, price } already
-      if (it.name && (it.quantity !== undefined || it.qty !== undefined)) {
-        return {
-          name: it.name,
-          quantity: it.quantity ?? it.qty ?? 1,
-          price: it.price ?? it.unitPrice ?? 0,
-        };
-      }
-      // if item id only or other loose shape, fallback:
-      return {
-        name: it.name ?? it.id ?? "Item",
-        quantity: it.qty ?? it.quantity ?? 1,
-        price: it.price ?? 0,
-      };
-    });
+    const mappedItems = (items || []).map((it) => ({
+      name: it.name ?? it.id ?? "Item",
+      quantity: it.quantity ?? it.qty ?? 1,
+      price: it.price ?? it.unitPrice ?? 0,
+    }));
 
     const assignedChef = await assignChef();
+    console.log(`Order created with assigned chef: ${assignedChef}`); // TEMP: Debug
 
-    // Create order document with required fields
     const newOrder = await Order.create({
       orderId: orderId || `ODR-${Date.now()}`,
-      type: type || "Takeaway",
+      type: type === "Dine In" || type === "DineIn" ? "Dine In" : "Takeaway",
       tableNumber: tableNumber ?? null,
       items: mappedItems,
-      totalAmount: Number(totalAmount) || mappedItems.reduce((s, i) => s + i.quantity * i.price, 0),
+      totalAmount:
+        Number(totalAmount) ||
+        mappedItems.reduce((sum, i) => sum + i.quantity * i.price, 0),
       clientName: clientName ?? user?.name ?? "",
       phoneNumber: phoneNumber ?? user?.phone ?? "",
       address: address ?? user?.address ?? "",
       instructions: instructions ?? "",
       assignedChef,
       status: "Processing",
-      processingTime: Math.floor(Math.random() * 10) + 5, // random countdown in minutes
+      processingTime: Math.floor(Math.random() * 10) + 5,
     });
 
-    // If Dine In, try to mark table reserved and increment bookedFor
-    if ((type === "Dine In" || type === "DineIn" || req.body.orderType === "Dine In") && tableNumber) {
-      try {
-        const t = await Table.findOneAndUpdate(
-          { tableNumber: Number(tableNumber) },
-          { reserved: true, $inc: { bookedFor: 1 } },
-          { new: true }
-        );
-        // ignore if fail
-      } catch (e) {
-        // ignore
-      }
+    // Reserve table for dine-in
+    if (newOrder.type === "Dine In" && newOrder.tableNumber) {
+      await Table.findOneAndUpdate(
+        { tableNumber: Number(newOrder.tableNumber) },
+        { reserved: true, $inc: { bookedFor: 1 } },
+        { new: true }
+      );
     }
 
     res.status(201).json(newOrder);
   } catch (error) {
+    console.error("Error creating order:", error);
     res.status(400).json({ message: error.message });
   }
 };
 
-// Update order status
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
-    res.json(order);
+
+    // Find order either by ObjectId or orderId string
+    const order = await Order.findOneAndUpdate(
+      { $or: [{ _id: id }, { orderId: id }] },
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ order });
   } catch (error) {
+    console.error("Error updating order:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+

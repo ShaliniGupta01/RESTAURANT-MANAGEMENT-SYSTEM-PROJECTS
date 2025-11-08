@@ -21,7 +21,7 @@ export const addMenuItem = async (req, res) => {
     }
 
     // If image uploaded via multer
-    const imagePath = req.file ? `/uploads/${req.file.filename}` : "null";
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     const newMenu = new Menu({
       name,
@@ -69,4 +69,3 @@ export const getAllMenuItems = async (req, res) => {
     });
   }
 };
-

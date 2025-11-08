@@ -5,7 +5,6 @@
   min-height: 100vh;
 }
 
-/* Greeting */
 .home-header {
   margin-bottom: 6px;
 }
@@ -19,12 +18,12 @@
   color: #6b7280;
 }
 
-/* Search + Cart */
 .search-row {
   display: flex;
   gap: 8px;
   align-items: center;
   margin-top: 8px;
+  margin-bottom: 14px;
 }
 
 .cart-total {
@@ -34,83 +33,12 @@
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
-/* Category Title */
 .category-title {
   font-size: 20px;
   font-weight: 700;
   margin: 12px 0;
 }
 
-/* Items Grid */
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  height: 52vh;
-  overflow: auto;
-  padding-bottom: 120px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-}
-
-/* Each Food Card look — matches screenshot */
-.items-grid .food-card {
-  background: #f9f9f9;
-  border-radius: 14px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.items-grid .food-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-.items-grid .food-card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-bottom: 1px solid #eee;
-}
-
-.items-grid .food-card .info {
-  padding: 10px;
-  background: linear-gradient(to bottom, #f9f9f9, #f1f1f1);
-}
-
-.items-grid .food-card .info h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.items-grid .food-card .info p {
-  font-size: 13px;
-  color: #444;
-}
-
-/* Scrollbar (white & minimal) */
-.items-grid::-webkit-scrollbar {
-  width: 6px;
-}
-.items-grid::-webkit-scrollbar-track {
-  background: transparent;
-}
-.items-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-}
-.items-grid::-webkit-scrollbar-thumb:hover {
-  background: #fff;
-}
-.items-grid {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.9) transparent;
-}
-
-/* Next Button Section */
 .next-fixed {
   position: fixed;
   left: 0;
@@ -120,21 +48,33 @@
   justify-content: center;
 }
 
-/* Modern, rounded Next Button */
 .btn-next {
-  background: #2f2f2f;
+  background: #505050;
   color: #fff;
-  padding: 12px 48px;
-  border-radius: 40px;
-  font-size: 16px;
-  font-weight: 500;
+  padding: 12px 38px;
+  border-radius: 18px;
   border: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.btn-next:hover {
-  background: #1f1f1f;
-  transform: scale(1.05);
+/* Blur background when modal visible */
+.home-shell.modal-active {
+  filter: blur(1.1px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  height: 52vh;
+  overflow-y: scroll;
+  padding-bottom: 120px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.items-grid::-webkit-scrollbar {
+  display: none;
 }

@@ -9,7 +9,9 @@ export default function CookInstructionsModal({ visible, onClose, onSave }) {
   return (
     <div className="cook-overlay">
       <div className="cook-card top">
-        <button className="close-btn" onClick={onClose}>✕</button>
+        <button className="close-btn" onClick={onClose}>
+          ✕
+        </button>
         <h3>Add Cooking instructions</h3>
 
         <textarea
@@ -24,7 +26,9 @@ export default function CookInstructionsModal({ visible, onClose, onSave }) {
         </p>
 
         <div className="cook-actions">
-          <button className="btn-cancel" onClick={onClose}>Cancel</button>
+          <button className="btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
           <button
             className="btn-next"
             onClick={() => {

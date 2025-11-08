@@ -67,9 +67,10 @@
 
 .order-count-card {
   border: 1px solid #e5e7eb;
-  padding: 10px 0;
+  padding: 8px 0;
   border-radius: 8px;
   text-align: center;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -134,9 +135,11 @@
   transition: width 0.5s ease, background-color 0.3s ease;
 }
 
+
+
 /* Light grey divider under 'Orders distribution overview' */
 .chart-divider {
   border: none;
   border-top: 1px solid #e0e0e0;
-  margin: 8px 0;
+  margin: 8px 0;
 }

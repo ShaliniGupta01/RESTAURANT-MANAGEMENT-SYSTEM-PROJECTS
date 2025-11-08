@@ -1,52 +1,58 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
-import { FaChartLine, FaTable, FaListAlt, FaPlus } from "react-icons/fa";
-
+import analyticsIcon from "../Assets/analytics.png";
+import tablesIcon from "../Assets/tables.png";
+import ordersIcon from "../Assets/orders.png";
+import addIcon from "../Assets/add.png";
 export default function Sidebar() {
   return (
     <aside className="sidebar">
       <nav className="sidebar-nav">
-        <div className="nav-icons-group">
-          <NavLink
-            to="/analytics"
-            className={({ isActive }) =>
-              isActive ? "nav-item active" : "nav-item"
-            }
-          >
-            <FaChartLine className="nav-icon" title="Analytics" />
-          </NavLink>
+        <NavLink
+          to="/analytics"
+          className={({ isActive }) =>
+            isActive ? "nav-item active" : "nav-item"
+          }
+        >
+          <img src={analyticsIcon} alt="Analytics" className="nav-icon" />
+        </NavLink>
 
-          <NavLink
-            to="/tables"
-            className={({ isActive }) =>
-              isActive ? "nav-item active" : "nav-item"
-            }
-          >
-            <FaTable className="nav-icon" title="Tables" />
-          </NavLink>
+        <NavLink
+          to="/tables"
+          className={({ isActive }) =>
+            isActive ? "nav-item active" : "nav-item"
+          }
+        >
+          <img src={tablesIcon} alt="Tables" className="nav-icon" />
+        </NavLink>
 
-          <NavLink
-            to="/orders"
-            className={({ isActive }) =>
-              isActive ? "nav-item active" : "nav-item"
-            }
-          >
-            <FaListAlt className="nav-icon" title="Orders" />
-          </NavLink>
+        <NavLink
+          to="/orders"
+          className={({ isActive }) =>
+            isActive ? "nav-item active" : "nav-item"
+          }
+        >
+          <img src={ordersIcon} alt="Orders" className="nav-icon" />
+        </NavLink>
 
-          <NavLink
-            to="/add-product"
-            className={({ isActive }) =>
-              isActive ? "nav-item active" : "nav-item"
-            }
-          >
-            <FaPlus className="nav-icon" title="Add Product" />
-          </NavLink>
-        </div>
+        <NavLink
+          to="/admin-menu"
+          className={({ isActive }) =>
+            isActive ? "nav-item active" : "nav-item"
+          }
+        >
+          <img src={addIcon} alt="Add Product" className="nav-icon" />
+        </NavLink>
 
-        {/*  Extra empty circle at bottom */}
-        <div className="bottom-circle"></div>
+        
+        <NavLink
+          to="#"
+          onClick={(e) => e.preventDefault()}
+          className="nav-item logout-link"
+        >
+          {/* <img  alt="Logout" className="nav-icon" /> */}
+        </NavLink>
       </nav>
     </aside>
   );

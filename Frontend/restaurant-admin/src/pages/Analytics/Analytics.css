@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  height: 100vh;
+  height: 90vh;   
   box-sizing: border-box;
   overflow: hidden;
  
@@ -12,7 +12,15 @@
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
   flex-grow: 1;
   min-height: 0;
+}
+
+
+.blurred {
+  filter: blur(5px);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: all 0.3s ease;
 }

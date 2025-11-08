@@ -1,22 +1,20 @@
 import React from "react";
 import "./Categorymenu.css";
-import {
-  FaHamburger,
-  FaPizzaSlice,
-  FaGlassWhiskey,
-  FaCarrot,
-  FaUtensils,
-} from "react-icons/fa";
+
+// Import PNG images
+import burgerImg from "../../Assets/Bug.png";
+import pizzaImg from "../../Assets/pizz.png";
+import drinkImg from "../../Assets/dk.png";
+import friesImg from "../../Assets/veg.png";
+import veggiesImg from "../../Assets/vgg.png";
 
 export default function Categorymenu({ categories = [], selected, onSelect }) {
-  // Map category names to icons
   const icons = {
-    Burger: <FaHamburger size={20} />,
-    Pizza: <FaPizzaSlice size={20} />,
-    Drink: <FaGlassWhiskey size={20} />,
-    "French fries": <FaUtensils size={20} />,
-    Veggies: <FaCarrot size={20} />,
-    Default: <FaUtensils size={20} />,
+    Burger: burgerImg,
+    Pizza: pizzaImg,
+    Drink: drinkImg,
+    "French fries": friesImg,
+    Veggies: veggiesImg,
   };
 
   return (
@@ -29,8 +27,7 @@ export default function Categorymenu({ categories = [], selected, onSelect }) {
             onClick={() => onSelect(cat)}
           >
             <div className="cat-icon">
-              {/*  fallback icon for unknown categories */}
-              {icons[cat] || icons.Default}
+              <img src={icons[cat]} alt={cat} className="cat-img" />
             </div>
             <span className="cat-label">{cat}</span>
           </button>

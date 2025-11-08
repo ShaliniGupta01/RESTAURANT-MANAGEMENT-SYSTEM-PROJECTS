@@ -35,7 +35,7 @@ const OrderMetric = ({ name, value, total, color }) => {
   );
 };
 
-export default function OrderSummary({ served, dineIn, takeAway, filter, setFilter }) {
+export default function OrderSummary({ served = 0, dineIn = 0, takeAway = 0, filter, setFilter }) {
   const totalOrders = served + dineIn + takeAway;
 
   const pieData = useMemo(
@@ -54,11 +54,10 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
         <TimeFilter selected={filter} setSelected={setFilter} />
       </div>
 
-      {/*  Light grey divider under header */}
       <hr className="chart-divider" />
 
       <div className="order-summary-content">
-        {/* === Order Count Boxes === */}
+        {/* Order Count Cards */}
         <div className="order-count-cards">
           <div className="order-count-card white-bg">
             <span className="count-value">{String(served).padStart(2, "0")}</span>
@@ -74,8 +73,9 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
           </div>
         </div>
 
+        {/* Pie Chart and Metrics */}
         <div className="order-pie-and-metrics">
-          {/* === Pie Chart === */}
+          {/* Pie Chart */}
           <ResponsiveContainer width="30%" height={100}>
             <PieChart>
               <Pie
@@ -92,7 +92,7 @@ export default function OrderSummary({ served, dineIn, takeAway, filter, setFilt
             </PieChart>
           </ResponsiveContainer>
 
-          {/* === Metrics Progress Bars === */}
+          {/* Progress Metrics */}
           <div className="metrics-list">
             <OrderMetric
               name="Take Away"

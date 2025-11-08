@@ -1,18 +1,20 @@
-
-
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import CartSummary from "../../components/CartSummary/Cart";
 import CookingInstruction from "../../components/CookingInstruction/CookingInstruction";
-import SearchBar from "../../components/SearchBar/SearchBar";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../../components/SearchBar/SearchBar";
 import "./Checkout.css";
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const [cart, setCart] = useState(JSON.parse(localStorage.getItem("rms_cart")) || []);
-  // eslint-disable-next-line no-unused-vars
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("rms_user")) || {});
+  const [cart, setCart] = useState(
+    JSON.parse(localStorage.getItem("rms_cart")) || []
+  );
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("rms_user")) || {}
+  );
   const [orderType, setOrderType] = useState("Dine In");
   const [cookVisible, setCookVisible] = useState(false);
   const [instructions, setInstructions] = useState("");
@@ -22,13 +24,13 @@ export default function Checkout() {
   // Fetch tables
   useEffect(() => {
     api
-      .get("/tables")
+      .get("/api/tables")
       .then((res) => {
         const t = Array.isArray(res.data) ? res.data : res.data.tables || [];
         setTables(t);
       })
       .catch(() => {
-        // fallback mock tables
+        // fallback local tables if API fails
         setTables(
           Array.from({ length: 30 }, (_, i) => ({
             tableNumber: i + 1,
@@ -39,35 +41,42 @@ export default function Checkout() {
       });
   }, []);
 
-  // Persist cart
+  // Save cart in localStorage
   useEffect(() => {
     localStorage.setItem("rms_cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Update quantity
-  const updateQty = (id, delta) => {
-    setCart((prev) => {
-      const p = prev.find((x) => x.id === id);
-      if (!p && delta > 0)
-        return [...prev, { id, name: "Item", price: 0, qty: delta }];
+  // Lock body scroll when modal visible
+  useEffect(() => {
+    document.body.style.overflow = cookVisible ? "hidden" : "auto";
+  }, [cookVisible]);
 
+  // Update item quantity
+  const updateQty = (_id, name, delta) => {
+    setCart((prev) => {
       const updated = prev
         .map((x) =>
-          x.id === id ? { ...x, qty: Math.max(0, x.qty + delta) } : x
+          x._id === _id && x.name === name
+            ? { ...x, qty: Math.max(0, x.qty + delta) }
+            : x
         )
         .filter((x) => x.qty > 0);
 
       if (updated.length === 0) navigate("/");
-
       return updated;
     });
+  };
+
+  // Remove item from cart
+  const removeItem = (_id, name) => {
+    setCart((prev) => prev.filter((x) => !(x._id === _id && x.name === name)));
   };
 
   // Calculate totals
   const computeTotals = () => {
     const itemsTotal = cart.reduce((s, c) => s + c.qty * c.price, 0);
     const delivery = orderType === "Take Away" ? 50 : 0;
-    const taxes = 5;
+    const taxes = Math.round(itemsTotal * 0.05);
     return {
       itemsTotal,
       delivery,
@@ -103,16 +112,18 @@ export default function Checkout() {
         return;
       }
       tableNumber = table.tableNumber;
+
+      // mark reserved locally
       setTables((prev) =>
         prev.map((t) =>
           t.tableNumber === table.tableNumber ? { ...t, reserved: true } : t
         )
       );
-      try {
-        await api.patch(`/tables/${table.tableNumber}`, { reserved: true });
-      } catch {
-        console.warn("Table reservation failed, proceeding locally.");
-      }
+
+      // no backend PATCH to avoid 404 error
+      console.log(
+        `✅ Table #${table.tableNumber} reserved locally (backend call skipped).`
+      );
     }
 
     const totals = computeTotals();
@@ -124,19 +135,20 @@ export default function Checkout() {
         name: item.name,
         quantity: item.qty,
         price: item.price,
-        image: item.image || "", //  Include image if exists
+        image: item.image || "",
       })),
       totalAmount: totals.grandTotal,
       clientName: user?.name || "Guest",
       phoneNumber: user?.phone || "N/A",
-      address: orderType === "Take Away" ? user?.address || "N/A" : "Restaurant",
+      address:
+        orderType === "Take Away" ? user?.address || "N/A" : "Restaurant",
       instructions,
       totals,
       user,
     };
 
     try {
-      const res = await api.post("/orders", orderData);
+      const res = await api.post("/api/orders", orderData);
       if (res.status === 201 || res.status === 200) {
         alert("Order placed successfully!");
         localStorage.removeItem("rms_cart");
@@ -144,12 +156,12 @@ export default function Checkout() {
         navigate("/thankyou");
       }
     } catch (err) {
-      console.error(" Order creation failed:", err);
-      alert(" Could not place order. Try again.");
+      console.error("Order creation failed:", err);
+      alert("Could not place order. Try again.");
     }
   };
 
-  // Dynamic greeting
+  // Greeting
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "morning";
@@ -159,82 +171,101 @@ export default function Checkout() {
 
   return (
     <div className="checkout-shell">
-      {/* Header greeting */}
-      <header className="home-header">
-        <div className="greet">
-          <div className="greet-large">Good {greeting}</div>
-          <div className="greet-small">Place your order here</div>
-        </div>
-      </header>
-
-      {/* Search bar */}
-      <SearchBar value={search} onChange={setSearch} />
-
-      {/* Cart items */}
-      <div className="cart-items">
-        {cart.map((it) => (
-          <div className="cart-item" key={it.id}>
-            <div className="cart-img">
-              <img
-                src={
-                  it.image
-                    ? it.image.startsWith("http")
-                      ? it.image
-                      : `http://localhost:5000/${it.image}`
-                    : "/placeholder.png"
-                }
-                alt={it.name}
-              />
-            </div>
-            <div className="cart-info">
-              <div className="ci-name">{it.name}</div>
-              <div className="ci-price">₹{it.price}</div>
-            </div>
-            <div className="ci-controls">
-              <button onClick={() => updateQty(it.id, -1)}>-</button>
-              <span>{it.qty}</span>
-              <button onClick={() => updateQty(it.id, +1)}>+</button>
-            </div>
+      <div className={`checkout-content ${cookVisible ? "blurred" : ""}`}>
+        {/* Header */}
+        <header className="home-header">
+          <div className="greet">
+            <div className="greet-large">Good {greeting}</div>
+            <div className="greet-small">Place your order here</div>
           </div>
-        ))}
-      </div>
+        </header>
 
-      {/* Add cooking instructions */}
-      <div style={{ marginTop: 10 }}>
-        <button className="add-instruction" onClick={() => setCookVisible(true)}>
-          Add cooking instructions (optional)
-        </button>
-      </div>
+        {/* Search bar */}
+        <SearchBar value={search} onChange={setSearch} />
 
-      {instructions && (
-        <div className="cook-summary">
-          <strong>Cooking Instructions:</strong> {instructions}
+        {/* Cart items */}
+        <div className="cart-items">
+          {cart.map((it) => (
+            <div className="cart-item" key={it._id}>
+              <div className="cart-item-inner">
+                <div className="cart-img">
+                  <img
+                    src={
+                      it.image
+                        ? it.image.startsWith("http")
+                          ? it.image
+                          : `https://restaurant-backend-1rky.onrender.com/${it.image}`
+                        : "/placeholder.png"
+                    }
+                    alt={it.name}
+                  />
+                </div>
+                <div className="cart-info">
+                  <div className="ci-name">{it.name}</div>
+                  <div className="ci-price">₹{it.price}</div>
+                </div>
+                <div className="ci-controls">
+                  <button onClick={() => updateQty(it._id, it.name, -1)}>
+                    -
+                  </button>
+                  <span>{it.qty}</span>
+                  <button onClick={() => updateQty(it._id, it.name, +1)}>
+                    +
+                  </button>
+                </div>
+
+                {/* Delete button */}
+                <button
+                  className="ci-delete"
+                  onClick={() => removeItem(it._id, it.name)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
 
-      {/* Dine In / Take Away toggle */}
-      <div className={`order-type ${orderType === "Take Away" ? "swap" : ""}`}>
-        <button
-          className={orderType === "Dine In" ? "active" : ""}
-          onClick={() => setOrderType("Dine In")}
-        >
-          Dine In
-        </button>
-        <button
-          className={orderType === "Take Away" ? "active" : ""}
-          onClick={() => setOrderType("Take Away")}
-        >
-          Take Away
-        </button>
+        {/* Add cooking instructions */}
+        <div style={{ marginTop: 10 }}>
+          <button
+            className="add-instruction"
+            onClick={() => setCookVisible(true)}
+          >
+            Add cooking instructions (optional)
+          </button>
+        </div>
+
+        {instructions && (
+          <div className="cook-summary">
+            <strong>Cooking Instructions:</strong> {instructions}
+          </div>
+        )}
+
+        {/* Dine In / Take Away toggle */}
+        <div className={`order-type ${orderType === "Take Away" ? "swap" : ""}`}>
+          <button
+            className={orderType === "Dine In" ? "active" : ""}
+            onClick={() => setOrderType("Dine In")}
+          >
+            Dine In
+          </button>
+          <button
+            className={orderType === "Take Away" ? "active" : ""}
+            onClick={() => setOrderType("Take Away")}
+          >
+            Take Away
+          </button>
+        </div>
+
+        {/* Order summary */}
+        <CartSummary
+          cart={cart}
+          user={user}
+          orderType={orderType}
+          onPlaceOrder={handlePlaceOrder}
+        />
       </div>
-
-      {/* Swipe-to-order summary */}
-      <CartSummary
-        cart={cart}
-        user={user}
-        orderType={orderType}
-        onPlaceOrder={handlePlaceOrder}
-      />
 
       {/* Cooking instruction modal */}
       <CookingInstruction
@@ -245,4 +276,3 @@ export default function Checkout() {
     </div>
   );
 }
-
