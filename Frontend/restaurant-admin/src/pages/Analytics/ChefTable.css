@@ -1,0 +1,36 @@
+.chef-performance-card {
+  background: #ffffff;
+  border: 1.5px solid #d9d9d9;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  margin-top: 20px;
+}
+
+.chef-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.chef-table th {
+  background-color: #f0f5f3;
+  color: #374151;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #d9d9d9;
+}
+
+.chef-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chef-table tr:last-child td {
+  border-bottom: none;
+}
+
+.chef-table tr:hover {
+  background-color: #f9fafb;
+}

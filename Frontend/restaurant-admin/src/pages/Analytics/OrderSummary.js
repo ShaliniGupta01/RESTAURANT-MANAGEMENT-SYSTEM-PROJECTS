@@ -48,7 +48,8 @@ export default function OrderSummary({ served = 0, dineIn = 0, takeAway = 0, fil
   );
 
   return (
-    <ChartCard title="Order Summary" className="order-summary-card">
+    <ChartCard  className="order-summary-card">
+        <p className="heading ">Order Summary</p>
       <div className="chart-header-controls">
         <p className="placeholder-text">Orders distribution overview</p>
         <TimeFilter selected={filter} setSelected={setFilter} />

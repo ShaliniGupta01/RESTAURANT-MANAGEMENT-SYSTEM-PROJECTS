@@ -38,7 +38,8 @@ export default function RevenueChart({ lineData, revenueFilter, setRevenueFilter
   }));
 
   return (
-    <ChartCard title="Revenue" className="revenue-card">
+    <ChartCard className="revenue-card">
+    <p className="heading">Revenue</p>
       <div className="chart-header-controls">
         <div className="header-text-section">
           <p className="placeholder-text">Revenue performance overview</p>

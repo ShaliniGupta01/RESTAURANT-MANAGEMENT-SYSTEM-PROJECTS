@@ -34,7 +34,7 @@ export default function Tables() {
     try {
       setLoading(true);
       await API.post("/api/tables", payload);
-      await fetchTables(); // ensures fresh list with correct _id
+      await fetchTables();
       setShowModal(false);
     } catch (err) {
       console.error("Error adding table:", err);
@@ -48,9 +48,8 @@ export default function Tables() {
   const deleteTable = async (id) => {
     if (!window.confirm("Are you sure you want to delete this table?")) return;
     try {
-      console.log("Deleting table ID:", id);
       await API.delete(`/api/tables/${id}`);
-      await fetchTables(); // refresh after delete
+      await fetchTables();
     } catch (err) {
       console.error("Error deleting table:", err);
       alert("Failed to delete table. Check if ID exists in backend.");
@@ -86,61 +85,75 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* Add Table */}
-        <div className="add-table-wrapper">
-          <div
-            className="add-table-card"
-            onClick={() => setShowModal((prev) => !prev)}
-            title="Add Table"
-          >
-            <FaPlus className="plus-icon" />
-          </div>
-
-          {showModal && (
-            <div className="side-modal">
-              <button className="close-btn" onClick={() => setShowModal(false)}>
-                ✕
-              </button> 
-              <label className="label">Table name (optional)</label>
-              <input
-                placeholder="Enter table name..."
-                className="input-field"
-                id="tableName"
-              />
-              <div className="table-number-big">
-                {String(nextTableNumber).padStart(2, "0")}
-              </div>
-
-              <hr className="divider" />
-
-              <label className="label">Chairs</label>
-              <select id="chairCount" className="select-field">
-                <option value="2">02</option>
-                <option value="4">04</option>
-                <option value="6">06</option>
-                <option value="8">08</option>
-              </select>
-
-              <button
-                className="btn-create-full"
-                disabled={loading}
-                onClick={() => {
-                  const name = document.getElementById("tableName").value;
-                  const size = Number(
-                    document.getElementById("chairCount").value
-                  );
-                  addTable({
-                    size,
-                    tableName: name,
-                    tableNumber: nextTableNumber,
-                  });
-                }}
-              >
-                {loading ? "Creating..." : "Create"}
-              </button>
+        {/* ➕ Add Table (hide after 31 tables) */}
+        {tables.length < 31 && (
+          <div className="add-table-wrapper">
+            <div
+              className="add-table-card"
+              onClick={() => setShowModal((prev) => !prev)}
+              title="Add Table"
+            >
+              <FaPlus className="plus-icon" />
             </div>
-          )}
-        </div>
+
+            {showModal && (
+              <div className="side-modal">
+                <button
+                  className="close-btn"
+                  onClick={() => setShowModal(false)}
+                >
+                  ✕
+                </button>
+
+                <label className="label">Table name (optional)</label>
+                <input
+                  placeholder="Enter table name..."
+                  className="input-field"
+                  id="tableName"
+                />
+
+                <div className="table-number-big">
+                  {String(nextTableNumber).padStart(2, "0")}
+                </div>
+
+                <hr className="divider" />
+
+                <label className="label">Chairs</label>
+                <select id="chairCount" className="select-field">
+                  <option value="2">02</option>
+                  <option value="4">04</option>
+                  <option value="6">06</option>
+                  <option value="8">08</option>
+                </select>
+
+                <button
+                  className="btn-create-full"
+                  disabled={loading}
+                  onClick={() => {
+                    const name = document.getElementById("tableName").value;
+                    const size = Number(
+                      document.getElementById("chairCount").value
+                    );
+
+                    //  Limit table number up to 31 only
+                    if (nextTableNumber > 31) {
+                      alert("You can only create up to 31 tables.");
+                      return;
+                    }
+
+                    addTable({
+                      size,
+                      tableName: name,
+                      tableNumber: nextTableNumber,
+                    });
+                  }}
+                >
+                  {loading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

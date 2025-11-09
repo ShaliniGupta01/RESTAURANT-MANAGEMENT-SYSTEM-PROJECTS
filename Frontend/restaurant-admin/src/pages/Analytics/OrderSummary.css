@@ -16,6 +16,13 @@
   padding: 0 5px;
 }
 
+.heading {
+  font-size: 15px;
+  font-weight: 500;
+   color: #6E6E6E;
+  margin: 0;
+}
+
 .placeholder-text {
   font-size: 8px;
   color: #9ca3af;
@@ -62,15 +69,16 @@
 .order-count-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
+  height: 11vh;
 }
 
 .order-count-card {
   border: 1px solid #e5e7eb;
-  padding: 8px 0;
+  padding: 20px 0;
   border-radius: 8px;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
 }
@@ -85,8 +93,8 @@
 
 .count-value {
   font-size: 20px;
-  font-weight: 700;
-  color: #1f2937;
+  font-weight: 500;
+  color: #6b7280;
 }
 
 .count-label {
@@ -99,7 +107,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  height: 120px;
+  height: 24vh;
 }
 
 .metrics-list {
@@ -118,12 +126,12 @@
 .metric-header {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .metric-bar-container {
-  height: 6px;
+  height: 10px;
   background-color: #e5e7eb;
   border-radius: 4px;
   overflow: hidden;

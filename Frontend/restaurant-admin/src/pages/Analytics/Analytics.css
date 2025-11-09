@@ -1,21 +1,22 @@
 .analytics-page {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  height: 90vh;   
+  gap: 20px;
+  padding: 20px;
   box-sizing: border-box;
-  overflow: hidden;
- 
+  min-height: 100vh;
+  overflow: visible !important;
 }
+
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, 1.5fr);
+  gap: 20px;
   flex-grow: 1;
-  min-height: 0;
+  align-items: stretch;
 }
+
 
 
 .blurred {

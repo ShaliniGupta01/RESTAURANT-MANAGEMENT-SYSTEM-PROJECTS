@@ -1,6 +1,6 @@
 import Menu from "../models/menuModel.js";
 
-// Add a new menu item
+//  Add a new menu item
 export const addMenuItem = async (req, res) => {
   try {
     const {
@@ -13,14 +13,15 @@ export const addMenuItem = async (req, res) => {
       rating,
     } = req.body;
 
+    // Basic validation
     if (!name || !price || !category) {
       return res.status(400).json({
         success: false,
-        message: " Name, price, and category are required fields.",
+        message: "Name, price, and category are required fields.",
       });
     }
 
-    // If image uploaded via multer
+    //  If image uploaded via multer, store its relative path
     const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     const newMenu = new Menu({
@@ -38,7 +39,7 @@ export const addMenuItem = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: " Menu item added successfully!",
+      message: "Menu item added successfully!",
       data: newMenu,
     });
   } catch (error) {
@@ -51,10 +52,11 @@ export const addMenuItem = async (req, res) => {
   }
 };
 
-//  Get all menu items
+// Get all menu items
 export const getAllMenuItems = async (req, res) => {
   try {
     const menu = await Menu.find().sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       count: menu.length,

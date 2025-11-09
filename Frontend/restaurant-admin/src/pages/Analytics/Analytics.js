@@ -1,4 +1,3 @@
-
 import React, {
   useEffect,
   useState,
@@ -8,11 +7,11 @@ import React, {
 } from "react";
 import API from "../../api/axios";
 import "./Analytics.css";
-import StatsRow from "./StatsRow";
+import CardRow from "./CardRow";
 import OrderSummary from "./OrderSummary";
 import RevenueChart from "./RevenueChart";
-import TablesOverview from "./TablesOverview";
-import ChefPerformance from "./ChefPerformance";
+import TablesSummary from "./TablesSummary";
+import ChefTable from "./ChefTable";
 import { useSearch } from "../../context/SearchContext";
 
 const Analytics = forwardRef((props, ref) => {
@@ -104,7 +103,7 @@ const Analytics = forwardRef((props, ref) => {
       <h3>Analytics</h3>
 
       <div className={getBlurClass("stats")}>
-        <StatsRow stats={stats} />
+        <CardRow stats={stats} />
       </div>
 
       <div className="analytics-grid">
@@ -127,22 +126,19 @@ const Analytics = forwardRef((props, ref) => {
         </div>
 
         <div className={getBlurClass("tablesOverview")}>
-          <TablesOverview />
+          <TablesSummary />
         </div>
       </div>
 
       <div className={getBlurClass("chef")}>
-        <ChefPerformance chefPerformance={chefPerformance} />
+        <ChefTable chefPerformance={chefPerformance} />
       </div>
 
       {loading && (
-        <p style={{ textAlign: "center", fontSize: "12px" }}>
-          Loading data...
-        </p>
+        <p style={{ textAlign: "center", fontSize: "12px" }}>Loading data...</p>
       )}
     </div>
   );
 });
 
 export default Analytics;
-

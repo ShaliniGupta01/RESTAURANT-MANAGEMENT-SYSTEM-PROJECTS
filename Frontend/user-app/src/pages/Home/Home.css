@@ -41,7 +41,7 @@
 
 .next-fixed {
   position: fixed;
-  left: 0;
+  left: 34vh;
   right: 0;
   bottom: 16px;
   display: flex;

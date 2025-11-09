@@ -4,9 +4,9 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Analytics from "./pages/Analytics/Analytics";
 import Tables from "./pages/Tables";
-import Orders from "./pages/Orders";
+import OrderLine from "./pages/OrderLine";
 import "./App.css";
-import AdminMenu from "./pages/AdminMenu";
+import MenuPage from "./pages/MenuPage";
 
 function App() {
   return (
@@ -19,8 +19,8 @@ function App() {
             <Route path="/" element={<Navigate to="/analytics" replace />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/tables" element={<Tables />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/admin-menu" element={<AdminMenu />} />
+            <Route path="/orders" element={<OrderLine />} />
+            <Route path="/admin-menu" element={<MenuPage />} />
             <Route path="*" element={<div>404 Not Found</div>} />
           </Routes>
         </main>
