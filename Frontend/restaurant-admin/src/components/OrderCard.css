@@ -1,3 +1,4 @@
+/* === MAIN ORDER CARD CONTAINER === */
 .order-card {
   border-radius: 20px;
   padding: 16px;
@@ -14,7 +15,7 @@
   transform: translateY(-4px);
 }
 
-/* === CARD COLORS === */
+/* === BACKGROUND COLORS === */
 .processing-card {
   background: #ffe7c8;
 }
@@ -27,7 +28,7 @@
   background: #c3ccd5;
 }
 
-/* === HEADER (white area) === */
+/* === HEADER === */
 .order-header {
   background: #ffffff;
   border-radius: 12px;
@@ -39,32 +40,32 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.order-header .left {
+.left {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
 }
 
-.icon {
-  color: #007aff;
+.left .icon {
   font-size: 20px;
+  color: #555;
   margin-top: 2px;
 }
 
-.order-header h3 {
+.left div h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
 }
 
-.order-header p {
+.left div p {
   font-size: 13px;
-  color: #333;
+  color: #555;
   margin: 2px 0;
   line-height: 1.3;
 }
 
-/* === TYPE BOX (Dine In / Takeaway / Done) === */
+/* === ORDER TYPE BADGES === */
 .order-type {
   border-radius: 12px;
   padding: 6px 12px;
@@ -74,13 +75,12 @@
 
 .type-title {
   font-weight: 600;
-  font-size: 18px;
-  margin: 0px;
 }
 
 .type-sub {
-  font-size: 11px;
-  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+  margin: 0px;
 }
 
 .type-processing {
@@ -88,9 +88,9 @@
   color: #a75500;
 }
 
-.type-done {
-  background: #b7f7c1;
-  color: #055e1a;
+.type-dine {
+  background: #fcd9b6;
+  color: #a75500;
 }
 
 .type-takeaway {
@@ -98,28 +98,24 @@
   color: #2f3e52;
 }
 
-/* === ITEM COUNT === */
-.item-count {
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 8px;
-  color: #111;
+.type-done {
+  background: #b7f7c1;
+  color: #055e1a;
 }
 
-/* === BODY (white inner box for items) === */
+/* === BODY === */
 .order-body {
-  background: #ffffff;
+  background: #fff;
   border-radius: 14px;
   padding: 12px 14px;
   border: 1px solid #f0f0f0;
-  margin: 10px 0;
   flex-grow: 1;
   overflow-y: auto;
 }
 
 .order-item ul {
-  padding-left: 16px;
-  margin: 4px 0;
+  padding-left: 18px;
+  margin: 6px 0;
 }
 
 .order-item li {
@@ -128,7 +124,7 @@
   margin-bottom: 4px;
 }
 
-/* === FOOTER BUTTON (bottom status button) === */
+/* === FOOTER BUTTON === */
 .order-footer {
   display: flex;
   justify-content: center;
@@ -140,8 +136,8 @@
   padding: 8px 14px;
   align-self: center;
   border: none;
-  outline: none;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .footer-processing {
@@ -159,35 +155,6 @@
   color: #2f3e52;
 }
 
-.clock-icon,
-.done-icon {
-  font-size: 14px;
-}
-
-
-/* === CONTAINER FOR CARDS (4 PER ROW) === */
-.order-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* exactly 4 per row */
-  gap: 20px; /* spacing between cards */
-  padding: 20px;
-}
-
-/* Responsive layout for smaller screens */
-@media (max-width: 1200px) {
-  .order-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 900px) {
-  .order-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .order-container {
-    grid-template-columns: 1fr;
-  }
+.order-footer:hover {
+  opacity: 0.9;
 }

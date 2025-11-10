@@ -93,7 +93,7 @@
   font-weight: 600;
 }
 
-/* ---------------- ORDER TYPE TOGGLE ---------------- */
+/* ORDER TYPE TOGGLE */
 .order-type {
   display: flex;
   align-items: center;
@@ -142,7 +142,7 @@
   left: calc(50% + 0px);
 }
 
-/* ---------------- BUTTON & COOKING NOTE ---------------- */
+/* BUTTON & COOKING NOTE */
 .btn {
   padding: 8px 12px;
   border-radius: 8px;
@@ -167,7 +167,7 @@
   font-size: 14px;
 }
 
-/* ---------------- ADD COOKING INSTRUCTION ---------------- */
+/* ADD COOKING INSTRUCTION */
 .add-instruction {
   display: block;
   width: 100%;

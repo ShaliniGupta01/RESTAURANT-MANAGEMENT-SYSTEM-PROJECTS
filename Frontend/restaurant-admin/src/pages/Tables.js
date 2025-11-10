@@ -58,11 +58,12 @@ export default function Tables() {
 
   return (
     <div className="tables-page">
-      <h2>Tables</h2>
+      <h2 className="text">Tables</h2>
 
       <div className="tables-grid">
         {tables.map((t) => (
           <div key={t._id || t.tableNumber} className="table-card">
+            {/* Delete icon */}
             <button
               className="delete-icon"
               onClick={() => deleteTable(t._id)}
@@ -71,11 +72,15 @@ export default function Tables() {
               <FaTrashAlt />
             </button>
 
-            <div className="table-name">{t.tableName || "Table"}</div>
-            <div className="table-number">
-              {String(t.tableNumber).padStart(2, "0")}
+            {/* Center content */}
+            <div className="table-center">
+              <div className="table-name">Table</div>
+              <div className="table-number">
+                {String(t.tableNumber).padStart(2, "0")}
+              </div>
             </div>
 
+            {/* Footer */}
             <div className="table-footer">
               <FaChair className="chair-icon" />
               <span className="chair-count">
@@ -85,7 +90,7 @@ export default function Tables() {
           </div>
         ))}
 
-        {/* ➕ Add Table (hide after 31 tables) */}
+        {/*  Add Table (hide after 31 tables) */}
         {tables.length < 31 && (
           <div className="add-table-wrapper">
             <div
@@ -135,7 +140,6 @@ export default function Tables() {
                       document.getElementById("chairCount").value
                     );
 
-                    //  Limit table number up to 31 only
                     if (nextTableNumber > 31) {
                       alert("You can only create up to 31 tables.");
                       return;

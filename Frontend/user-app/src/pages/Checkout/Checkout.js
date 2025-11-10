@@ -122,7 +122,7 @@ export default function Checkout() {
 
       // no backend PATCH to avoid 404 error
       console.log(
-        `✅ Table #${table.tableNumber} reserved locally (backend call skipped).`
+        `Table #${table.tableNumber} reserved locally (backend call skipped).`
       );
     }
 

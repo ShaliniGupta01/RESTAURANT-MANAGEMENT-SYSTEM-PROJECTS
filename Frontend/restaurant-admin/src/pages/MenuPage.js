@@ -6,7 +6,7 @@ import "./MenuPage.css";
 import { useSearch } from "../context/SearchContext";
 
 export default function MenuPage() {
-  const { searchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useSearch(); // get setter from context
   const [products, setProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function MenuPage() {
     fetchProducts();
   };
 
-  //  Filter products by category OR name (case-insensitive)
+  // Filter products by category OR name
   const filteredProducts = useMemo(() => {
     if (!searchTerm) return products;
     const term = searchTerm.toLowerCase();
@@ -60,7 +60,15 @@ export default function MenuPage() {
     <div className="menu-container">
       <div className={`menu-page ${showModal ? "blur-bg" : ""}`}>
         <div className="menu-header">
-          <h2>Product Menu</h2>
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+
           <button className="add-btn" onClick={() => setShowModal(true)}>
             Add Product
           </button>
@@ -69,7 +77,7 @@ export default function MenuPage() {
         {loading ? (
           <p className="loading">Loading...</p>
         ) : filteredProducts.length === 0 ? (
-          <p className="empty">No products found</p>
+          <p className="empty">No products found.</p>
         ) : (
           <div className="product-grid">
             {filteredProducts.map((item) => (

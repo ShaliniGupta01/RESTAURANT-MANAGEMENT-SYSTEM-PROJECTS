@@ -1,13 +1,20 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
+import logo from "../Assets/rest.jpg";
 import analyticsIcon from "../Assets/analytics.png";
 import tablesIcon from "../Assets/tables.png";
 import ordersIcon from "../Assets/orders.png";
 import addIcon from "../Assets/add.png";
+
 export default function Sidebar() {
   return (
     <aside className="sidebar">
+      {/* Logo at the top */}
+      <div className="sidebar-logo">
+        <img src={logo} alt="Logo" className="logo-img" />
+      </div>
+
       <nav className="sidebar-nav">
         <NavLink
           to="/analytics"
@@ -45,7 +52,6 @@ export default function Sidebar() {
           <img src={addIcon} alt="Add Product" className="nav-icon" />
         </NavLink>
 
-        
         <NavLink
           to="#"
           onClick={(e) => e.preventDefault()}

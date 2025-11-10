@@ -52,7 +52,7 @@ export default function FoodCard({ item, qty = 0, onChangeQty }) {
                 className="btn-add"
                 onClick={() => onChangeQty(item, +1)}
               >
-                ＋
+                +
               </button>
             )}
           </div>

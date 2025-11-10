@@ -14,7 +14,7 @@ body,
 
 body {
   font-family: "Inter", system-ui, Arial, sans-serif;
-  background: #F0F5F3;
+  background: #f0f5f3;
   color: #111;
   overflow: hidden;
 }
@@ -27,43 +27,12 @@ body {
   width: 100%;
 }
 
-/* Header full width, fixed height */
-header {
-  width: 100%;
-  height: 60px;
-  background-color: #F0F5F3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  flex-shrink: 0;
-}
-
 /* Sidebar + content below header */
 .body-section {
   display: flex;
   flex: 1;
   width: 100%;
-  height: calc(100vh - 60px); 
+  height: calc(100vh - 60px);
   overflow: hidden;
-  background-color: #F0F5F3;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 80px;
-  background-color: #F0F5F3;
-  height: 100%;
-  overflow: auto;
-  padding-top: 5px;
-}
-
-/* Main content */
-.content-area {
-  flex: 1;
-  background: #ffffff;
-  padding: 10px;
-  height: 100%;
-  border-radius: 32px;
-  overflow: auto;
+  background-color: #f0f5f3;
 }

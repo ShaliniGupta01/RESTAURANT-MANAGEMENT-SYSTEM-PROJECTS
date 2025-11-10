@@ -1,14 +1,66 @@
+/* === Overall Page === */
+
+.content-area {
+  flex: 1;
+  padding: 16px;
+  height: 100%;
+  border-radius: 20px;
+  overflow: auto;
+}
+
 .analytics-page {
   display: flex;
   flex-direction: column;
+  background-color: white;
+  border-radius: 20px;
   gap: 20px;
   padding: 20px;
   box-sizing: border-box;
   min-height: 100vh;
   overflow: visible !important;
+  margin-top: 80px;
 }
 
+/* === Top Filter Bar === */
+.analytics-top-filter {
+  position: fixed;
+  top: 0;
+  left: 70px;
+  width: calc(100% - 70px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
 
+  padding: 22px 25px;
+}
+
+/* === Search Input === */
+.analytics-top-filter input {
+  width: 100%;
+  max-width: 380px;
+  padding: 13px 20px;
+  border-radius: 18px;
+  border: 1px solid #fff;
+  outline: none;
+  height: 50px;
+  font-size: 15px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.analytics-top-filter input:focus {
+  border-color: #eef1ee;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* === Header Text === */
+.analytics-page h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 10px 0 0 10px;
+}
+
+/* === Grid === */
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1.5fr);
@@ -17,8 +69,7 @@
   align-items: stretch;
 }
 
-
-
+/* === Blur Class === */
 .blurred {
   filter: blur(5px);
   opacity: 0.4;

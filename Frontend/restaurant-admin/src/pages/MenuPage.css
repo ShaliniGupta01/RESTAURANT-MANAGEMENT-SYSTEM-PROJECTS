@@ -1,37 +1,28 @@
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px; 
-  padding-top: 20px;
-  justify-content: center;
-}
-
-
-.menu-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.menu-page {
-  width: 100%;
-  max-width: 1400px;
-  margin: auto;
-}
-
-
-.menu-page.blur-bg {
-  filter: blur(4px);
-  pointer-events: none;
-  user-select: none;
-}
-
+/* Toolbar container (holds search bar and button) */
 .menu-header {
+  position: absolute;
+  top: 40px;
+  left: 100px;
+  right: 20px;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
 }
 
+/* Search input on the left */
+.search-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 30px;
+  height: 50px;
+  border-radius: 18px;
+  border: 1px solid #fff;
+  font-size: 14px;
+}
+
+/* Add Product button on the right */
 .add-btn {
   background: #3a3b3a;
   color: white;
@@ -40,7 +31,39 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+
 .add-btn:hover {
   background: #caebd7;
+}
+
+/* Product grid: 3 products per row with proper gaps */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 100px 80px 40px 80px;
+  justify-items: center;
+}
+
+/* Product item can have max width */
+.product-grid .product-item {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* No products found message */
+.empty {
+  margin-top: 16vh;
+  padding-left: 10pc;
+  font-size: 16px;
+  color: #555;
+}
+
+/* Blur background when modal open */
+.menu-page.blur-bg {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
 }

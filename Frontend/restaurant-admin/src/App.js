@@ -1,7 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
 import Analytics from "./pages/Analytics/Analytics";
 import Tables from "./pages/Tables";
 import OrderLine from "./pages/OrderLine";
@@ -11,7 +10,6 @@ import MenuPage from "./pages/MenuPage";
 function App() {
   return (
     <div className="app-container">
-      <Header />
       <div className="body-section">
         <Sidebar />
         <main className="content-area">

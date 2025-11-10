@@ -22,15 +22,15 @@ const CardRow = ({ title, value, icon: Icon, iconColor, bgColor, isBlurred }) =>
 );
 
 export default function StatsRow({ stats = {} }) {
-  const { searchTerm } = useSearch(); // 🔹 get search text
+  const { searchTerm } = useSearch(); 
   const term = searchTerm?.toLowerCase().trim() || "";
 
   const { totalRevenue = 0, totalOrders = 0, totalClients = 0 } = stats;
 
 
   const shouldBlur = (title) => {
-    if (!term) return false; // show all if empty
-    if (term === "total") return false; // all visible for "total"
+    if (!term) return false; 
+    if (term === "total") return false; 
 
     // specific matches
     if (term.includes("total chef")) return title !== "TOTAL CHEF";
