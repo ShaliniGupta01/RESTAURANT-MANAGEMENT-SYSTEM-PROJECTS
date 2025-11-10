@@ -83,7 +83,7 @@ export default function Home() {
     fetchMenu();
   }, [selected]);
 
-  // --- Auto-switch category when search matches ---
+  
   useEffect(() => {
     if (!search) return;
     const foundCategory = CATEGORIES.find(
@@ -146,7 +146,7 @@ export default function Home() {
   const qtyOf = (id, name) =>
     cart.find((c) => c._id === id && c.name === name)?.qty || 0;
 
-  // --- Infinite scroll (Load more items) ---
+ 
   const loadMore = () => {
     const filtered = items.filter(
       (i) =>
@@ -174,11 +174,11 @@ export default function Home() {
   // --- Render ---
   return (
     <>
-      <div className={`home-shell ${showDetails ? "modal-active" : ""}`}>
+      <div className={`home-page ${showDetails ? "modal-active" : ""}`}>
         {/* Header */}
         <header className="home-header">
-          <div className="greet">
-            <div className="greet-large">
+          <div className="group">
+            <div className="group-large">
               Good{" "}
               {(() => {
                 const h = new Date().getHours();
@@ -187,11 +187,11 @@ export default function Home() {
                 return "evening";
               })()}
             </div>
-            <div className="greet-small">Place your order here</div>
+            <div className="group-small">Place your order here</div>
           </div>
         </header>
 
-        {/* Search bar + Cart total */}
+       
         <div className="search-row">
           <SearchBar value={search} onChange={setSearch} />
           {cart.length > 0 && (
@@ -201,7 +201,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Category menu */}
+        
         {(!search ||
           !CATEGORIES.some((cat) =>
             cat.toLowerCase().includes(search.toLowerCase())

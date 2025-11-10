@@ -60,11 +60,11 @@ export default function UserDetails({ visible, onSave }) {
   };
 
   return (
-    <div className="dm-overlay">
-      <div className="dm-card">
+    <div className="user-overlay">
+      <div className="user-card">
         <h3>Enter Your Details</h3>
 
-        <div className="form-group">
+        <div className="form">
           <label>Name</label>
           <input
             type="text"
@@ -74,7 +74,7 @@ export default function UserDetails({ visible, onSave }) {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form">
           <label>Number of Person</label>
           <input
             type="number"
@@ -86,7 +86,7 @@ export default function UserDetails({ visible, onSave }) {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form">
           <label>Address</label>
           <input
             type="text"
@@ -96,7 +96,7 @@ export default function UserDetails({ visible, onSave }) {
           />
         </div>
 
-        <div className="form-group">
+        <div className="form">
           <label>Contact</label>
           <input
             type="text"
@@ -106,7 +106,7 @@ export default function UserDetails({ visible, onSave }) {
           />
         </div>
 
-        <div className="dm-actions">
+        <div className="btn-actions">
           <button onClick={handleSave} className="btn-save" disabled={saving}>
             {saving ? "Saving..." : "Order Now"}
           </button>
